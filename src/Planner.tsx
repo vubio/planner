@@ -35,12 +35,22 @@ export default function Planner(){
  const patch=(id:string,p:Partial<Task>)=>update({...dataRef.current,tasks:dataRef.current.tasks.map(t=>t.id===id?{...t,...p}:t)});
  const readStore=()=>JSON.parse(localStorage.getItem('vubio-planner-v1')||'null');
  const refresh=async()=>{const b=readStore();setArchives(b?.archives||[]);return b};
- useEffect(()=>{try{const b=readStore();if(b){if(!validData(b.data))throw Error('Invalid saved data');setData({...b.data,tags:(b.data.tags||[]).filter((t:Tag)=>t.taskId)});setRevision(b.revision||0);setArchives(b.archives||[])}setMessage('Saved in this browser')}catch{storageBlocked.current=true;setMessage('Saved data could not be read. Saving is paused to protect it.')}setLoaded(true);if(!storageBlocked.current)setDirty(true);const timer=setInterval(()=>{setNow(new Date());try{const s=readStore();if(s&&s.activeWeek!==local(monday(new Date())).slice(0,10))setDirty(true)}catch{}},30000);return()=>clearInterval(timer)},[]);
+ useEffect(()=>{try{const b=readStore();if(b){
+   // Earlier releases allowed free-floating tags, while later releases attach
+   // tags to tasks. Accept both formats without discarding the user's tasks.
+   const tags=Array.isArray(b.data?.tags)?b.data.tags.filter((t:Tag)=>t.taskId).map((t:Tag)=>({...t,x:Number.isFinite(t.x)?t.x:0,y:Number.isFinite(t.y)?t.y:80})):[];
+   const restored={...b.data,tags};
+   if(!validData(restored))throw Error('Saved planner format is incompatible');
+   setData(restored);setRevision(b.revision||0);setArchives(b.archives||[])
+  }setMessage('Saved in this browser')}
+  catch(e:any){storageBlocked.current=true;setMessage('NOT SAVED · '+(e?.message||'Cannot read browser storage')+' · Export a backup')}
+  setLoaded(true);if(!storageBlocked.current)setDirty(true);
+  const timer=setInterval(()=>{setNow(new Date());try{const s=readStore();if(s&&s.activeWeek!==local(monday(new Date())).slice(0,10))setDirty(true)}catch{}},30000);return()=>clearInterval(timer)},[]);
  useEffect(()=>{if(scroll.current)scroll.current.scrollLeft=bufferDays*dayW},[week,view,night,zoom,loaded,viewport]);
  useEffect(()=>{if(loaded&&scroll.current)scroll.current.scrollTop=verticalPad},[loaded,focusMode,viewportHeight]);
  const snapshotHTML=()=>recordHTML(dataRef.current,week);
  const save=(snapshot?:string):boolean=>{
-  if(storageBlocked.current){setMessage('Saving paused: browser storage could not be read. Export a backup.');return false;}
+  if(storageBlocked.current){setMessage('NOT SAVED · Stored planner could not be read safely · Export a backup');return false;}
   if(saving.current)return false;
   saving.current=true;
   try{
