@@ -127,3 +127,7 @@ main>header h1{margin:4px 0}
 .attached-tag.tag-pill{border-radius:20px}
 .attached-tag.tag-diamond{border-radius:2px 12px 2px 12px}
 .task.compact .task-tags{display:none}
+
+/* Center each time stamp over the guide it names, including its stem. */
+.ticks span{margin-left:0;transform:translateX(-50%);text-align:center}
+.ticks span::before{left:50%;transform:translateX(-50%)}
