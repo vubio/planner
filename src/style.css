@@ -45,3 +45,38 @@ header p{font-size:14px;color:#5f7463}
 .timeline-footer{font-size:11px;color:#5b745f}
 .fields label,.detail-label,.inline-label{font-size:13px}
 @media(max-width:700px){.palette{order:2;width:100%;border-right:0;padding-top:4px}.palette button{width:22px;height:22px}.timeline{height:62vh}}
+
+/* Time ruler: readable labels, independent fine-grained hour guides. */
+.ticks span{white-space:nowrap;margin-left:5px;letter-spacing:-.1px}
+.time-grid-line{position:absolute;top:0;bottom:0;border-left:1px solid rgba(97,125,104,.15);width:0}
+.day-grid{overflow:hidden}
+.snap-line{position:absolute;top:80px;z-index:6;border-left:2px dashed #1a746a;pointer-events:none;filter:drop-shadow(0 0 2px #ffffff)}
+.snap-line span{position:absolute;top:6px;left:7px;padding:5px 8px;border-radius:5px;background:#185e56;color:#fff;font-size:12px;font-weight:800;white-space:nowrap;box-shadow:0 3px 9px #153f3f55}
+.timeline-footer{align-items:center;gap:15px;flex-wrap:wrap;line-height:2.3;padding:8px 0 11px;font-size:11px}
+.timeline-footer kbd{display:inline-block;font:800 11px 'DM Sans',system-ui,sans-serif;line-height:1.3;color:#284b3b;background:linear-gradient(#ffffff,#e8efe6);border:1px solid #b4c5b6;border-bottom:3px solid #8ba591;box-shadow:0 1px 2px #253c3233;border-radius:5px;padding:3px 7px;margin:0 2px;vertical-align:baseline}
+
+/* Normal mode favors the canvas; supplementary notes remain below it. */
+main{padding-top:18px}
+main>header{margin-bottom:15px}
+main>header h1{margin:4px 0}
+.toolbar{padding:7px 0}
+.canvas-tools{padding:8px 0}
+.timeline{height:calc(100vh - 266px);min-height:520px}
+.focus-entry{background:#e0eadd!important;color:#2b5a42!important;border:1px solid #a9c2ac!important;font-weight:750!important;padding:7px 10px!important;white-space:nowrap}
+.focus-entry:hover{background:#cfe0ce!important}
+
+/* Focused view keeps all relevant actions in floating, collapsible strips. */
+.focus-floating{display:none}
+.app.focus-mode{height:100vh;overflow:hidden}
+.app.focus-mode .sidebar,.app.focus-mode main>header,.app.focus-mode .timeline-footer,.app.focus-mode .bottom-panel,.app.focus-mode main>footer{display:none}
+.app.focus-mode main{padding:0;min-height:100vh}
+.app.focus-mode .toolbar{position:fixed;top:0;left:12px;right:285px;z-index:18;border:1px solid #cddccf;border-radius:10px;background:#f9fcf6f7;padding:5px 12px;box-shadow:0 4px 18px #183d2b19;min-height:42px}
+.app.focus-mode .canvas-tools{position:fixed;top:48px;left:12px;right:12px;z-index:17;background:#f9fcf6f7;border:1px solid #d5e1d5;border-radius:9px;box-shadow:0 4px 18px #183d2b19;padding:6px 12px;min-height:42px}
+.app.focus-mode .canvas-tools>span{display:none}
+.app.focus-mode .timeline{position:fixed;top:106px;left:0;right:0;bottom:0;width:100%;height:auto;min-height:0;max-height:none;z-index:10;border-radius:0;border:0}
+.app.focus-mode .focus-floating{position:fixed;right:12px;top:5px;z-index:20;display:flex;gap:5px;background:#f9fcf6;border:1px solid #cddccf;border-radius:8px;padding:4px;box-shadow:0 4px 16px #183d2b22}
+.focus-floating button{padding:5px 9px;font-size:12px;color:#2c5941;font-weight:750}
+.app.focus-mode.focus-controls-hidden .toolbar,.app.focus-mode.focus-controls-hidden .canvas-tools{display:none}
+.app.focus-mode.focus-controls-hidden .timeline{top:46px}
+@media(max-width:1100px){.app.focus-mode .toolbar{right:250px}.app.focus-mode .timeline{top:145px}.app.focus-mode.focus-controls-hidden .timeline{top:46px}}
+@media(max-width:700px){.timeline{height:calc(100vh - 270px);min-height:480px}.app.focus-mode .toolbar{right:12px;top:42px}.app.focus-mode .canvas-tools{top:105px}.app.focus-mode .timeline{top:205px}}
