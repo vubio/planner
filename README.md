@@ -22,7 +22,18 @@ In this repository, open **Settings → Pages**. Under **Build and deployment**,
 
 ## Data storage — read this first
 
-Data is stored in **localStorage on the current browser and device**. It is not uploaded to the public GitHub repository. There is no cloud synchronization or server authentication. Other visitors get their own empty planner.
+Data is stored in **localStorage on the current browser and device**. It is not uploaded to the public GitHub repository. Other visitors get their own empty planner. Optional manual backup/restore with your own Google Drive is available via the **Google Drive** button.
+
+### Optional Google Drive backup and restore
+
+1. Create or select a project in [Google Cloud Console](https://console.cloud.google.com/).
+2. Enable the **Google Drive API** for the project.
+3. Configure the OAuth consent screen. If the app is in Testing, include your Google account as a test user.
+4. Create an OAuth **Web application** client. Add `https://vubio.github.io` (without trailing slash) to Authorized JavaScript origins; for local testing, also add your localhost development origin.
+5. On the planner, choose **Google Drive**, enter the Web client ID ending with `.apps.googleusercontent.com`, and connect your account.
+6. Use **Upload this planner** to send the current browser copy to the hidden Drive application-data folder. On another computer, connect using the same client ID and choose **Restore from Drive** before editing.
+
+This only asks for `drive.appdata` permission and cannot browse the rest of your Drive. Never enter an OAuth client secret. Sync is deliberately manual and **does not merge changes** from multiple devices. Upload replaces the previous Drive copy. Restore replaces the current browser copy after downloading a safety backup, then reloads the planner. Avoid simultaneous edits on different devices. OAuth login may require reconnection after reloading.
 
 Export backups regularly. Clearing site data, using private browsing, or changing computers can remove or separate your data. A JSON backup contains tasks and archives; import it to move computers. HTML snapshot exports contain an independent SVG timeline and readable task table, so they remain readable after app redesigns.
 
