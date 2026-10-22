@@ -107,3 +107,23 @@ main>header h1{margin:4px 0}
 .tag-fields{margin-top:15px}
 .tag-modal{max-width:480px}
 .timeline.panning,.timeline.panning *{cursor:grabbing!important;user-select:none!important}
+
+/* Quiet resize affordance; the corner works without a visible handle. */
+.resize-corner,.task:hover .resize-corner,.task.selected .resize-corner{background:transparent!important;box-shadow:none!important;border:0!important}
+.resize-corner{width:18px;height:18px}
+
+/* Label stems align exactly with the stronger matching time guide. */
+.ticks span{margin-left:7px;position:absolute}
+.ticks span::before{content:'';position:absolute;top:14px;left:-7px;width:0;height:11px;border-left:2px solid #668779;opacity:.85}
+.day-grid{border-left:1px solid #9fb6a4}
+.labeled-grid-line{border-left:1px solid #8fae9a;z-index:1}
+.connections .edge-selected{filter:drop-shadow(0 0 4px #fff) drop-shadow(0 0 3px #284c3e);stroke-width:5;stroke-dasharray:7 3;animation:selected-edge-dash .7s linear infinite}
+@keyframes selected-edge-dash{to{stroke-dashoffset:-10}}
+
+/* Task-bound tags travel with the task and can be edited independently. */
+.task-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.attached-tag{display:inline-block;max-width:100%;padding:3px 7px;color:#fff;border:1px solid #ffffffb8;border-radius:4px 10px 10px 4px;font-weight:800;font-size:11px;line-height:1.35;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 1px 3px #25362640;cursor:pointer}
+.attached-tag:hover{filter:brightness(1.15);background-color:inherit}
+.attached-tag.tag-pill{border-radius:20px}
+.attached-tag.tag-diamond{border-radius:2px 12px 2px 12px}
+.task.compact .task-tags{display:none}
