@@ -80,3 +80,30 @@ main>header h1{margin:4px 0}
 .app.focus-mode.focus-controls-hidden .timeline{top:46px}
 @media(max-width:1100px){.app.focus-mode .toolbar{right:250px}.app.focus-mode .timeline{top:145px}.app.focus-mode.focus-controls-hidden .timeline{top:46px}}
 @media(max-width:700px){.timeline{height:calc(100vh - 270px);min-height:480px}.app.focus-mode .toolbar{right:12px;top:42px}.app.focus-mode .canvas-tools{top:105px}.app.focus-mode .timeline{top:205px}}
+
+/* Richer task cards scale by revealing content, never by shrinking type. */
+.task-notes{font-size:11px;line-height:1.5;font-weight:550;color:#294536;white-space:pre-wrap;overflow-wrap:anywhere;margin:9px 2px 0;border-top:1px solid #3f63402f;padding-top:6px}
+.task-checklist{font-size:11px;line-height:1.5;font-weight:600;padding:0;margin:7px 1px 0;list-style:none;overflow-wrap:anywhere}
+.task-checklist li{margin-bottom:3px}
+.task.compact .task-notes,.task.compact .task-checklist{display:none}
+.priority-mark{position:absolute;bottom:4px;right:5px;border-radius:5px;padding:2px 5px;background:#f7faf2eb;color:#405c41;font-size:10px;font-weight:850;letter-spacing:.2px;z-index:1;pointer-events:none;box-shadow:0 1px 3px #0002}
+.priority-mark.priority-1{background:#a62b39;color:#fff}
+.priority-mark.priority-2{background:#dc7934;color:#fff}
+.priority-mark.priority-3{background:#f1e8b9;color:#65562a}
+.priority-mark.priority-4,.priority-mark.priority-5{background:#e9eee9;color:#637565}
+.task.compact .priority-mark{right:3px;bottom:3px;font-size:9px}
+.resize-corner{position:absolute;bottom:-5px;right:-5px;width:16px;height:16px;z-index:5;cursor:nwse-resize;touch-action:none;border-radius:3px 0 4px 0;background:linear-gradient(135deg,transparent 48%,#ffffffc9 49%,#ffffffc9 58%,#365d49 60%,#365d49 70%,transparent 72%)}
+.task:hover .resize-corner,.task.selected .resize-corner{background:linear-gradient(135deg,transparent 34%,#ffffffd9 35%,#ffffffd9 45%,#365d49 47%,#365d49 63%,transparent 65%)}
+
+/* Movable, labeled canvas tags. */
+.tag-tool{border:1px solid #cadcca!important;background:#eff6ed!important;color:#346345!important;font-weight:750!important}
+.tag-tool.active{background:#c6dfca!important;box-shadow:0 0 0 2px #7ca88966}
+.canvas.placing-tag{cursor:crosshair}
+.canvas-tag{position:absolute;z-index:7;display:flex;align-items:center;gap:6px;max-width:260px;min-width:38px;padding:7px 11px;border-radius:5px 13px 13px 5px;color:#fff;font-size:12px;font-weight:800;box-shadow:0 3px 9px #1d392a44;cursor:grab;user-select:none;touch-action:none;white-space:pre-wrap;overflow-wrap:anywhere;outline:1px solid #ffffffa1}
+.canvas-tag:active{cursor:grabbing}
+.canvas-tag.tag-pill{border-radius:20px}
+.canvas-tag.tag-diamond{border-radius:2px 16px 2px 16px}
+.canvas-tag.tag-flag::after{content:'';position:absolute;top:100%;left:13px;border:7px solid transparent;border-top-color:inherit;filter:brightness(.9)}
+.tag-fields{margin-top:15px}
+.tag-modal{max-width:480px}
+.timeline.panning,.timeline.panning *{cursor:grabbing!important;user-select:none!important}
