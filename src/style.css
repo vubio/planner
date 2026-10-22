@@ -128,6 +128,18 @@ main>header h1{margin:4px 0}
 .attached-tag.tag-diamond{border-radius:2px 12px 2px 12px}
 .task.compact .task-tags{display:none}
 
+/* Four conventional invisible corner targets, with no permanent handles. */
+.resize-corner,.task:hover .resize-corner,.task.selected .resize-corner{width:17px;height:17px;background:transparent!important;z-index:9}
+.resize-corner.corner-nw{left:-4px;right:auto;top:-4px;bottom:auto;cursor:nwse-resize}
+.resize-corner.corner-ne{right:-4px;left:auto;top:-4px;bottom:auto;cursor:nesw-resize}
+.resize-corner.corner-sw{left:-4px;right:auto;bottom:-4px;top:auto;cursor:nesw-resize}
+.resize-corner.corner-se{right:-4px;left:auto;bottom:-4px;top:auto;cursor:nwse-resize}
+
+/* Tags occupy a ribbon above the block; notes and checklists keep the interior. */
+.task-tags{position:absolute;bottom:calc(100% + 4px);right:0;z-index:8;display:flex;flex-wrap:nowrap;max-width:max(180px,100%);margin:0;gap:4px;justify-content:flex-end;overflow:visible}
+.attached-tag{flex:0 0 auto;max-width:170px;min-height:20px;padding:2px 8px}
+.task.compact .task-tags{display:flex;bottom:calc(100% + 34px);right:0}
+
 /* Center each time stamp over the guide it names, including its stem. */
 .ticks span{margin-left:0;transform:translateX(-50%);text-align:center}
 .ticks span::before{left:50%;transform:translateX(-50%)}
