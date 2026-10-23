@@ -21,6 +21,7 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
  const state=useRef<SyncState>({remote:null,syncedHash:null,ready:false,pushing:false,checking:false});
  const statusRef=useRef(status);statusRef.current=status;
  const tokenRef=useRef(token);tokenRef.current=token;
+ const dirtyRef=useRef(dirty);dirtyRef.current=dirty;
  const saveTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const isMounted=useRef(true);
 
@@ -42,17 +43,36 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
   setLastSaved(remote.document.savedAt);setStatus('synced');setDetail('All tasks, notes, connections, tags, and weekly archives are in GitHub.');
  }
 
- async function restoreFromGithub(remote:RemoteDatabase,automatic=false){
+ async function restoreFromGithub(remote:RemoteDatabase,automatic=false,expectedLocalHash?:string){
   const existing=readLocalDatabase();
+  if(automatic){
+   if(dirtyRef.current){
+    // The planner may be in the middle of a 250 ms local save. Wait rather
+    // than replace work that is visible but not yet in localStorage.
+    setStatus('pending');setDetail('Waiting for the browser to finish saving before loading GitHub…');
+    setTimeout(()=>{if(isMounted.current)void inspectGithub()},600);
+    return;
+   }
+   if(expectedLocalHash&&await contentFingerprint(existing)!==expectedLocalHash){
+    state.current.ready=false;setStatus('conflict');
+    setDetail('The browser changed while GitHub was loading. Neither version has been replaced.');
+    return;
+   }
+  }
   if(!automatic&&containsPlannerWork(existing)){
    if(!confirm('Load the GitHub planner? A JSON backup of this browser’s current work will download first. The GitHub copy will replace the active browser view.'))return;
    exportBrowserSafetyCopy(JSON.stringify(existing,null,2));
   }
   const hash=await contentFingerprint(remote.document.stored);
-  // First record the remote identity; after reload, automatic browser saving
-  // cannot mistake this restored state for an unrelated local edit.
-  writeSyncMetadata({sha:remote.sha,hash,savedAt:remote.document.savedAt});
+  if(automatic&&dirtyRef.current){
+   setStatus('pending');setDetail('Waiting for the latest browser changes to finish saving before loading GitHub…');
+   setTimeout(()=>{if(isMounted.current)void inspectGithub()},600);
+   return;
+  }
+  // Write actual data first. If the browser is out of storage, we must not
+  // record a successful restore for a copy that was never written.
   localStorage.setItem(BROWSER_DATABASE_KEY,JSON.stringify(remote.document.stored));
+  writeSyncMetadata({sha:remote.sha,hash,savedAt:remote.document.savedAt});
   window.location.reload();
  }
 
@@ -61,9 +81,9 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
   state.current.checking=true;
   if(statusRef.current!=='pending'&&statusRef.current!=='saving')setStatus('checking');
   try{
-   const existing=readLocalDatabase(),localHash=await contentFingerprint(existing);
    const remote=await fetchGithubDatabase();
    if(!isMounted.current)return;
+   const existing=readLocalDatabase(),localHash=await contentFingerprint(existing);
    state.current.remote=remote;
    if(!remote){
     state.current.ready=false;
@@ -75,7 +95,8 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
    setLastSaved(remote.document.savedAt);
    if(localHash===remoteHash){setSynced(remote,localHash);return}
    if(!containsPlannerWork(existing)){
-    await restoreFromGithub(remote,true);
+    state.current.ready=false;
+    await restoreFromGithub(remote,true,localHash);
     return;
    }
    if(meta?.sha===remote.sha&&meta.hash===remoteHash){
@@ -88,7 +109,8 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
    if(meta?.hash===localHash&&meta.sha!==remote.sha){
     // The browser has made no local edits since its last confirmed save.
     // It can safely move forward to the version uploaded from another device.
-    await restoreFromGithub(remote,true);
+    state.current.ready=false;
+    await restoreFromGithub(remote,true,localHash);
     return;
    }
    state.current.ready=false;setStatus('conflict');
