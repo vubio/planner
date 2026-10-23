@@ -1,4 +1,6 @@
 export const dateKey=(d:Date)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+// One-click outcome cycle: planned/in-progress/stopped → done → failed → planned.
+export const nextTaskStatus=(status:string)=>status==='Done'?'Failed':status==='Failed'?'Planned':'Done';
 export function validData(d:any):boolean {
  if(!d||!Array.isArray(d.tasks)||!Array.isArray(d.edges)||!Array.isArray(d.questions)||typeof d.notes!=='string')return false;
  if(d.tags!==undefined&&(!Array.isArray(d.tags)||!d.tags.every((t:any)=>typeof t.id==='string'&&typeof t.text==='string'&&Number.isFinite(t.x)&&Number.isFinite(t.y)&&
