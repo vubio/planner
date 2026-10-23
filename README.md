@@ -1,6 +1,6 @@
 # Vubio Experiment Planner
 
-A horizontal, connected experiment planner for GitHub Pages. React + TypeScript + Vite; no server, account, or paid hosting required.
+A horizontal, connected experiment planner for GitHub Pages. React + TypeScript + Vite; no separate backend or paid hosting required.
 
 ## Open the website
 
@@ -10,19 +10,39 @@ In this repository, open **Settings → Pages**. Under **Build and deployment**,
 
 ## Features
 
-- Horizontal timeline across days and weeks; week/day scale, zoom, overnight toggle, current-time indicator.
-- Drag tasks; resize right edge for duration and bottom edge for visual height.
+- Horizontal timeline across days and weeks; week/three-day/day scale, zoom, overnight toggle, current-time indicator.
+- Drag tasks; resize every edge or corner, drag to create, Ctrl-drag to snap to half-hour boundaries, right-drag to pan.
 - Preparation spans: Shift-drag left on a task, drag the faint span, or enter minutes in task details.
 - Double-click to create and edit tasks, notes, checklists, priorities, colors, and outcomes.
-- Solid/dashed branching arrows. Select a task → Connect → select its successor. Double-click an arrow to remove it. Cycles are rejected.
+- Solid/dashed branching arrows. Select a task → Connect → select its successor, or Alt-drag between tasks. Cycles are rejected.
 - Failed/stopped tasks fade downstream steps. Done tasks have a completion marker.
-- Project, connected-sequence, and individual-task filters; search across all stored tasks.
-- Separate questions/discussions and scratchpad.
-- Browser autosave, undo, manual snapshots, automatic week-rollover snapshots, JSON backup import/export, standalone HTML snapshot exports.
+- Project, connected-sequence, individual-task, color, priority and tag filters; search across all stored tasks.
+- Compact canvas sticky notes for Ask & discuss, task-attached labels, and scratchpad.
+- Browser autosave, opt-in GitHub autosync, undo, manual snapshots, automatic week-rollover snapshots, JSON backup import/export, standalone HTML snapshot exports.
 
-## Data storage — read this first
+## Data storage — browser first, optional GitHub sync
 
-Data is stored in **localStorage on the current browser and device**. It is not uploaded to the public GitHub repository. Other visitors get their own empty planner. Optional manual backup/restore with your own Google Drive is available via the **Google Drive** button.
+Every change is saved in **localStorage on the current browser first**. The floating status button in the lower right shows whether the database is also current on GitHub. A locally saved edit is **not** necessarily a successful GitHub save; wait for the green **GitHub saved** status before switching devices.
+
+When enabled, GitHub saves the complete task database, connections, attached labels, sticky notes and weekly archives as `planner.json` on the separate [`planner-data` branch](https://github.com/vubio/planner/tree/planner-data). The website continues to deploy from `main`, so database updates do not redeploy the website. The branch and database are **publicly readable** because this repository is public. Do not put confidential research data into it.
+
+### First time: upload the lab computer's database
+
+**Do this first on the computer showing the up-to-date lab tasks**; avoid uploading a blank or outdated copy from another device.
+
+1. Open [GitHub fine-grained token settings](https://github.com/settings/personal-access-tokens/new) while signed in as the repository owner.
+2. Create a token with **Only select repositories → `vubio/planner`** and **Repository permissions → Contents → Read and write**; leave other permissions unchanged. Select an expiration convenient for you.
+3. Open the planner and click the floating **GitHub** status button near the bottom-right corner. Paste the token under **Allow saving from this computer** and click **Connect GitHub**. The token is saved in the current browser only (if **Remember on this device** is selected) and is **never saved to `planner.json` or committed to the repository**. Don't share it in chat or screenshots.
+4. On the lab computer, click **Upload this browser** and confirm. Wait for the green **GitHub saved · [time]** badge. This creates the first shared database file; until you do this, existing lab work is only in the lab browser.
+5. On another computer, open [the same planner website](https://vubio.github.io/planner/). If its browser database is empty, the GitHub copy loads automatically. To make changes on that computer and save them back to GitHub, connect the same token or a separate repo-scoped token there too.
+
+After initial connection, subsequent edits are uploaded automatically shortly after the browser save. GitHub saves are checked on return to the tab and periodically. If the browser copy has not changed since its last GitHub save, a newer GitHub version can load automatically. **When both devices contain different unsynchronized work, the planner pauses and asks you to choose a version; it does not silently merge or discard either one.** The **Load GitHub copy** action first downloads a browser JSON safety backup if it is replacing existing work. Uploading one browser's version over a different GitHub copy needs explicit confirmation; prior GitHub versions remain in commit history.
+
+You can use the planner without a token or without internet; it will still save locally, but the status badge will tell you it is not yet synced. If GitHub access expires or saving fails, renew your token and reconnect without deleting any browser data.
+
+### Existing optional Google Drive backup and restore
+
+The earlier Google Drive integration is still present but is separate from GitHub sync. It is not needed for the new GitHub database and has not been removed.
 
 ### Optional Google Drive backup and restore
 
@@ -35,11 +55,11 @@ Data is stored in **localStorage on the current browser and device**. It is not 
 
 This only asks for `drive.appdata` permission and cannot browse the rest of your Drive. Never enter an OAuth client secret. Sync is deliberately manual and **does not merge changes** from multiple devices. Upload replaces the previous Drive copy. Restore replaces the current browser copy after downloading a safety backup, then reloads the planner. Avoid simultaneous edits on different devices. OAuth login may require reconnection after reloading.
 
-Export backups regularly. Clearing site data, using private browsing, or changing computers can remove or separate your data. A JSON backup contains tasks and archives; import it to move computers. HTML snapshot exports contain an independent SVG timeline and readable task table, so they remain readable after app redesigns.
+Export backups periodically as an additional precaution. Clearing browser site data, using private browsing, or changing computers can remove the local copy and the locally stored writing token. A JSON backup contains tasks and archives; HTML snapshot exports contain an independent SVG timeline and readable task table, so they remain readable after app redesigns.
 
 Automatic snapshots preserve the previous active week's last saved state when the planner next opens or detects a new week while open. Nothing executes while the browser is closed. Manual snapshots capture immediately. Weeks with no activity do not generate artificial snapshots. Browser quota errors are reported; export before clearing anything.
 
-The code includes basic revision checks to detect stale tabs. Avoid editing the same planner simultaneously in multiple tabs. This is a personal planning tool, not a regulated laboratory record system.
+The code includes local revision checks and GitHub file-SHA conflict detection. Avoid simultaneous edits on multiple devices; conflicting edits require you to choose the version to keep. This is a personal planning tool, not a regulated laboratory record system.
 
 ## Development
 
@@ -58,8 +78,10 @@ The website uses the `/planner/` base path. Open the address printed by Vite wit
 
 - `src/Planner.tsx`: timeline and planner UI
 - `src/model.ts`: backup validation, graph traversal, independent snapshot rendering
+- `src/githubStore.ts`: GitHub Contents API, serialization, and cloud revision checks
+- `src/GithubSyncPanel.tsx`: cross-device autosync and explicit conflict-resolution interface
 - `src/style.css`: responsive UI styles
-- `tests/model.test.mjs`: validation, graph and export checks
+- `tests/`: validation, graph, export, and GitHub database integration tests
 - `docs/`: ready-to-publish static website
 
 ## Verification
