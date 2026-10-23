@@ -94,12 +94,12 @@ main>header h1{margin:4px 0}
 .task-checklist{font-size:11px;line-height:1.5;font-weight:600;padding:0;margin:7px 1px 0;list-style:none;overflow-wrap:anywhere}
 .task-checklist li{margin-bottom:3px}
 .task.compact .task-notes,.task.compact .task-checklist{display:none}
-.priority-mark{position:absolute;bottom:4px;right:5px;border-radius:5px;padding:2px 5px;background:#f7faf2eb;color:#405c41;font-size:10px;font-weight:850;letter-spacing:.2px;z-index:1;pointer-events:none;box-shadow:0 1px 3px #0002}
+.priority-mark{position:absolute;bottom:5px;right:27px;border:0;border-radius:5px;padding:2px 5px;background:#f7faf2eb;color:#405c41;font-size:10px;font-weight:850;letter-spacing:.2px;line-height:1.2;z-index:10;pointer-events:auto;cursor:pointer;touch-action:manipulation;box-shadow:0 1px 3px #0002}.priority-mark:hover{filter:brightness(.95);box-shadow:0 0 0 2px #fff,0 2px 7px #0003}
 .priority-mark.priority-1{background:#a62b39;color:#fff}
 .priority-mark.priority-2{background:#dc7934;color:#fff}
 .priority-mark.priority-3{background:#f1e8b9;color:#65562a}
 .priority-mark.priority-4,.priority-mark.priority-5{background:#e9eee9;color:#637565}
-.task.compact .priority-mark{right:3px;bottom:3px;font-size:9px}
+.task.compact .priority-mark{right:25px;bottom:3px;font-size:9px}
 .resize-corner{position:absolute;bottom:-5px;right:-5px;width:16px;height:16px;z-index:5;cursor:nwse-resize;touch-action:none;border-radius:3px 0 4px 0;background:linear-gradient(135deg,transparent 48%,#ffffffc9 49%,#ffffffc9 58%,#365d49 60%,#365d49 70%,transparent 72%)}
 .task:hover .resize-corner,.task.selected .resize-corner{background:linear-gradient(135deg,transparent 34%,#ffffffd9 35%,#ffffffd9 45%,#365d49 47%,#365d49 63%,transparent 65%)}
 
