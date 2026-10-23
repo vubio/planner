@@ -172,6 +172,18 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
   await uploadBrowser(true);
  }
 
+ async function manualRestore(){
+  setDetail('Checking GitHub for its newest planner version…');
+  try{
+   // Always refresh before restore: a concurrent save may have made the
+   // previous cached SHA stale, especially after a 409 conflict.
+   const latest=await fetchGithubDatabase();
+   state.current.remote=latest;
+   if(!latest){setStatus('needs-upload');setDetail('GitHub has no database to load yet. The browser database is untouched.');return}
+   await restoreFromGithub(latest);
+  }catch(e:any){setStatus(e instanceof TypeError?'offline':'error');setDetail(`${e?.message||'Could not load GitHub'}. Your browser data is unchanged.`)}
+ }
+
  useEffect(()=>{isMounted.current=true;return()=>{isMounted.current=false;if(saveTimer.current)clearTimeout(saveTimer.current)}},[]);
  useEffect(()=>{if(loaded)void inspectGithub()},[loaded]);
  useEffect(()=>{
@@ -202,7 +214,7 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
    {(status==='needs-upload'||status==='empty')&&<div className="github-sync-callout"><strong>First-time setup</strong><p>Your lab browser data is still here. Connect GitHub below, then click <em>Upload this browser</em> to create its first cloud backup. Nothing will be erased.</p></div>}
    {(status==='remote-newer'||status==='conflict')&&<div className="github-sync-callout"><strong>Two versions found</strong><p>Load the GitHub copy to see the newest shared data. A JSON backup of this browser will download before its active view is replaced.</p></div>}
    <div className="github-sync-actions">
-    <button className="github-primary-action" disabled={localSaveError||dirty||status==='checking'||status==='saving'||!state.current.remote} onClick={()=>{const remote=state.current.remote;if(remote)void restoreFromGithub(remote)}}>Load GitHub copy</button>
+    <button className="github-primary-action" disabled={localSaveError||dirty||status==='checking'||status==='saving'||!state.current.remote} onClick={()=>void manualRestore()}>Load latest GitHub copy</button>
     <button disabled={localSaveError||dirty||status==='checking'||status==='saving'||!token} onClick={()=>void manualUpload()}>Upload this browser</button>
     <button onClick={()=>void inspectGithub()} disabled={localSaveError||status==='checking'||status==='saving'}><RefreshCw size={14}/> Check GitHub</button>
    </div>
