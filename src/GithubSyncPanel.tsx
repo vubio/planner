@@ -16,7 +16,7 @@ function exportBrowserSafetyCopy(content:string){const blob=new Blob([content],{
 
 export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{loaded:boolean,revision:number,dirty:boolean,localSaveError:boolean}){
  const [status,setStatus]=useState<SyncStatus>('checking'),[detail,setDetail]=useState(''),[open,setOpen]=useState(false);
- const [token,setToken]=useState(storedToken),[draft,setDraft]=useState(''),[remember,setRemember]=useState(()=>{try{return !!localStorage.getItem(GITHUB_TOKEN_KEY)}catch{return false}});
+ const [token,setToken]=useState(storedToken),[draft,setDraft]=useState(''),[remember,setRemember]=useState(()=>{try{return !sessionStorage.getItem(GITHUB_TOKEN_KEY)}catch{return true}});
  const [account,setAccount]=useState(''),[lastSaved,setLastSaved]=useState(''),[connecting,setConnecting]=useState(false);
  const state=useRef<SyncState>({remote:null,syncedHash:null,ready:false,pushing:false,checking:false});
  const statusRef=useRef(status);statusRef.current=status;
