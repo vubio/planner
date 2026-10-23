@@ -6,7 +6,7 @@ A horizontal, connected experiment planner for GitHub Pages. React + TypeScript 
 
 After enabling Pages, the address is https://vubio.github.io/planner/.
 
-In this repository, open **Settings → Pages**. Under **Build and deployment**, choose **Deploy from a branch**, select **main** and **/docs**, then **Save**. The prebuilt website is included in `docs/`; no Actions or build setup is required to publish the first version.
+This repository currently deploys GitHub Pages from **main / (root)**. The root `index.html` loads the prebuilt files under `docs/assets/`. Keep that setting in **Settings → Pages**; the prebuilt website is committed alongside the source, so ordinary changes to the separate `planner-data` branch do not rebuild the page.
 
 ## Features
 
