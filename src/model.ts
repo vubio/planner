@@ -1,13 +1,18 @@
 export const dateKey=(d:Date)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 // One-click outcome cycle: planned/in-progress/stopped → done → failed → planned.
 export const nextTaskStatus=(status:string)=>status==='Done'?'Failed':status==='Failed'?'Planned':'Done';
+export function groupMovementIds(tasks:{id:string,groupId?:string}[],selected:string[]):string[]{
+ const selectedSet=new Set(selected);
+ const groupIds=new Set(tasks.filter(t=>selectedSet.has(t.id)&&t.groupId).map(t=>t.groupId));
+ return tasks.filter(t=>selectedSet.has(t.id)||(t.groupId&&groupIds.has(t.groupId))).map(t=>t.id);
+}
 export function validData(d:any):boolean {
  if(!d||!Array.isArray(d.tasks)||!Array.isArray(d.edges)||!Array.isArray(d.questions)||typeof d.notes!=='string')return false;
  if(d.tags!==undefined&&(!Array.isArray(d.tags)||!d.tags.every((t:any)=>typeof t.id==='string'&&typeof t.text==='string'&&Number.isFinite(t.x)&&Number.isFinite(t.y)&&
    // Attached labels don't use x/y coordinates; new ones intentionally start at 0,0.
    (typeof t.taskId==='string'||(t.x>=0&&t.y>=80))&&/^#[0-9a-f]{6}$/i.test(t.color)&&['flag','pill','diamond'].includes(t.shape))))return false;
  const ids=new Set<string>();
- for(const t of d.tasks){if(!t||typeof t.id!=='string'||ids.has(t.id)||!['title','start','color','project','priority','status','notes'].every(k=>typeof t[k]==='string')||!Number.isFinite(new Date(t.start).getTime())||!Number.isFinite(t.duration)||t.duration<15||!Number.isFinite(t.prep)||t.prep<0||!Number.isFinite(t.y)||t.y < -50000||!Number.isFinite(t.height)||t.height<44||!/^#[0-9a-f]{6}$/i.test(t.color)||!Array.isArray(t.checklist)||!t.checklist.every((c:any)=>typeof c.text==='string'&&typeof c.done==='boolean'))return false;ids.add(t.id)}
+ for(const t of d.tasks){if(!t||typeof t.id!=='string'||ids.has(t.id)||!['title','start','color','project','priority','status','notes'].every(k=>typeof t[k]==='string')||(t.groupId!==undefined&&(typeof t.groupId!=='string'||!t.groupId))||!Number.isFinite(new Date(t.start).getTime())||!Number.isFinite(t.duration)||t.duration<15||!Number.isFinite(t.prep)||t.prep<0||!Number.isFinite(t.y)||t.y < -50000||!Number.isFinite(t.height)||t.height<44||!/^#[0-9a-f]{6}$/i.test(t.color)||!Array.isArray(t.checklist)||!t.checklist.every((c:any)=>typeof c.text==='string'&&typeof c.done==='boolean'))return false;ids.add(t.id)}
  return (d.tags===undefined||d.tags.every((tag:any)=>tag.taskId===undefined||typeof tag.taskId==='string'&&ids.has(tag.taskId)))&&d.edges.every((e:any)=>typeof e.id==='string'&&ids.has(e.from)&&ids.has(e.to)&&e.from!==e.to&&typeof e.dashed==='boolean')&&d.questions.every((q:any)=>typeof q.id==='string'&&typeof q.text==='string'&&typeof q.done==='boolean'&&
    (q.at===undefined||(typeof q.at==='string'&&Number.isFinite(new Date(q.at).getTime())))&&
    (q.y===undefined||(Number.isFinite(q.y)&&q.y>=-50000))&&

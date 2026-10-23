@@ -1,8 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validData,reaches,recordHTML,dateKey,nextTaskStatus} from '../src/model.ts';
+import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds} from '../src/model.ts';
 const task={id:'a',title:'<script>alert(1)</script>',start:'2026-10-19T14:45',duration:15,prep:150,y:40,height:66,color:'#628875',project:'Test',priority:'High',status:'Planned',notes:'A & B',checklist:[{text:'<unsafe>',done:false}],floating:false};
 const data={tasks:[task],edges:[],questions:[],notes:'notes'};
+test('task groups persist in a valid saved planner without breaking older tasks',()=>{
+ const second={...task,id:'b',title:'Second grouped task'};
+ assert.equal(validData({...data,tasks:[{...task,groupId:'group-1'},{...second,groupId:'group-1'}]}),true);
+ assert.equal(validData({...data,tasks:[{...task,groupId:17}]}),false);
+ assert.equal(validData({...data,tasks:[{...task,groupId:''}]}),false);
+ assert.equal(validData(data),true);
+});
+test('dragging one grouped task moves every member, preserving other task groups',()=>{
+ const tasks=[{id:'a',groupId:'one'},{id:'b',groupId:'one'},{id:'c',groupId:'two'},{id:'d',groupId:'two'},{id:'e'}];
+ assert.deepEqual(groupMovementIds(tasks,['a']),['a','b']);
+ assert.deepEqual(groupMovementIds(tasks,['a','c']),['a','b','c','d']);
+ assert.deepEqual(groupMovementIds(tasks,['e']),['e']);
+});
 test('task quick action cycles planned to done to failed to planned',()=>{
  const statuses=['Planned'];for(let i=0;i<3;i++)statuses.push(nextTaskStatus(statuses[i]));
  assert.deepEqual(statuses,['Planned','Done','Failed','Planned']);

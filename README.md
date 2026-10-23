@@ -10,9 +10,11 @@ This repository currently deploys GitHub Pages from **main / (root)**. The root 
 
 ## Features
 
-- Horizontal timeline across days and weeks; week/three-day/day scale, zoom, overnight toggle, current-time indicator.
+- Horizontal timeline across days and weeks; week/three-day/day scale, last-week/next-week shortcuts, zoom, overnight toggle, current-time indicator.
 - Drag tasks; resize every edge or corner, drag to create, Ctrl-drag to snap to half-hour boundaries, right-drag to pan.
 - Preparation spans: Shift-drag left on a task, drag the faint span, or enter minutes in task details.
+- Shift-click tasks to select several; right-click to group/ungroup, add tags or sticky notes, edit, duplicate, connect, or delete. Right-drag still pans. Grouped items move together, and grouping survives browser/GitHub saves.
+- The color palette colors the next task when nothing is selected; with selected tasks it recolors those tasks immediately. New task dialogs focus and select the default title for immediate typing.
 - Double-click to create and edit tasks, notes, checklists, priorities, colors, and outcomes.
 - Solid/dashed branching arrows. Select a task → Connect → select its successor, or Alt-drag between tasks. Cycles are rejected.
 - Failed/stopped tasks fade downstream steps. Done tasks have a completion marker.

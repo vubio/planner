@@ -240,3 +240,25 @@ main>header h1{margin:4px 0}
 .github-remember{display:flex;align-items:center;gap:8px;cursor:pointer;color:#586957;font-size:11px;margin:9px 0 14px}
 .github-sync-footnote{font-size:11px;color:#7b8979;margin:14px 0 0;line-height:1.55}
 @media(max-width:700px){.github-sync-widget{right:10px;bottom:10px}.github-sync-indicator{padding:9px 11px;font-size:11px}.github-sync-modal{padding:17px}.github-sync-actions{flex-direction:column}.github-sync-actions button{justify-content:center}}
+
+/* Multiple task selection and persistent drag groups. */
+.task.grouped:not(.selected){outline:1px dashed #63866e;outline-offset:2px}
+.task.grouped.selected{outline:2px solid #285f41;outline-offset:3px}
+.task.grouped .task-meta{font-weight:900}
+.palette:has(button[aria-pressed="true"]) button[aria-pressed="true"]{box-shadow:0 0 0 2px #365d49}
+
+/* Compact tasks place their tags above both title and time, with a clear gap. */
+.task.compact .task-tags{bottom:calc(100% + 61px);z-index:12}
+
+/* Custom right-click actions; right-drag still pans the timeline. */
+.canvas-context-menu{position:fixed;z-index:38;width:214px;max-height:calc(100vh - 16px);overflow:auto;padding:7px;background:#fffefa;border:1px solid #b6c9b7;border-radius:10px;box-shadow:0 12px 36px #233c2f50;color:#2b4938}
+.context-menu-caption{padding:8px 10px 9px;font-size:12px;font-weight:850;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.context-menu-caption small{display:block;font-size:10px;line-height:1.55;color:#7a8d7b;font-weight:550;overflow:hidden;text-overflow:ellipsis}
+.canvas-context-menu button{width:100%;display:flex;justify-content:flex-start;text-align:left;padding:9px 10px;gap:9px;font-size:12px;font-weight:650;border-radius:6px;color:#395a44}
+.canvas-context-menu button:hover{background:#eaf3e8;color:#285c3e}
+.canvas-context-menu button:disabled{opacity:.35;cursor:not-allowed;background:transparent}
+.canvas-context-menu .context-danger{color:#a74a4a}
+.canvas-context-menu .context-danger:hover{background:#fbeceb}
+.canvas-context-menu kbd{margin-left:auto;padding:1px 5px;border:1px solid #c7d5c9;border-radius:4px;font-size:10px;background:#f1f5ef;color:#627868}
+.menu-symbol{display:inline-flex;align-items:center;justify-content:center;font-size:16px;width:15px;height:15px;color:#50755b}
+.context-menu-separator{height:1px;background:#e7ebe3;margin:6px 4px}
