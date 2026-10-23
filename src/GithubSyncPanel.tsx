@@ -102,6 +102,10 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
 
  function queueUpload(){
   if(saveTimer.current)clearTimeout(saveTimer.current);
+  if(!state.current.pushing){
+   setStatus('pending');
+   setDetail('Changes are saved in this browser and queued for GitHub. Keep this tab open until the green confirmation appears.');
+  }
   saveTimer.current=setTimeout(()=>{void uploadBrowser(false)},1700);
  }
 
