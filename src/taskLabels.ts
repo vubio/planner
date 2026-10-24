@@ -1,47 +1,31 @@
-/** Collision-aware title callouts for very narrow or overlapping timeline blocks. */
-export type LabelRect={id:string,x:number,y:number,width:number,height:number,title:string,tagCount:number};
-export type PlacedLabel={id:string,x:number,y:number,width:number,height:number,anchorX:number,anchorY:number,attachX:number,attachY:number};
-
-const LABEL_WIDTH=224;
-const GAP=11;
+/** Gentle compact-title placement: nearby text, never detached callout cards. */
+export type TaskLabelRect={id:string,x:number,y:number,width:number,height:number,title:string};
+export type CompactTitlePosition={id:string,left:number,top:number};
 type Box={x:number,y:number,width:number,height:number};
-const intersects=(a:Box,b:Box,pad=0)=>a.x<b.x+b.width+pad&&a.x+a.width+pad>b.x&&a.y<b.y+b.height+pad&&a.y+a.height+pad>b.y;
-const overlapArea=(a:Box,b:Box)=>Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
-const clamp=(v:number,min:number,max:number)=>Math.min(Math.max(v,min),max);
 
-export function arrangeTaskLabels(tasks:LabelRect[],canvasWidth:number,canvasHeight:number):PlacedLabel[]{
- const callouts=tasks.filter(t=>t.width<190||tasks.some(other=>other.id!==t.id&&intersects(t,other,1)));
- const occupied:Box[]=[...tasks];
- const placed:PlacedLabel[]=[];
- for(const task of callouts.sort((a,b)=>a.y-b.y||a.x-b.x||a.id.localeCompare(b.id))){
-  const labelHeight=70+(task.tagCount?23:0);
-  const ownCenterX=task.x+task.width/2,ownCenterY=task.y+task.height/2;
-  const candidateBoxes:Box[]=[];
-  const add=(x:number,y:number)=>candidateBoxes.push({x:clamp(x,0,Math.max(0,canvasWidth-LABEL_WIDTH)),y:clamp(y,83,Math.max(83,canvasHeight-labelHeight)),width:LABEL_WIDTH,height:labelHeight});
-  // Keep callouts near their task when possible; stagger into free lanes when crowded.
-  for(let lane=0;lane<5;lane++){
-   const offset=lane*(labelHeight+GAP);
-   add(task.x,task.y-labelHeight-GAP-offset);
-   add(ownCenterX-LABEL_WIDTH/2,task.y-labelHeight-GAP-offset);
-   add(task.x,task.y+task.height+GAP+offset);
-   add(ownCenterX-LABEL_WIDTH/2,task.y+task.height+GAP+offset);
-   add(task.x+task.width+GAP+lane*28,task.y);
-   add(task.x-LABEL_WIDTH-GAP-lane*28,task.y);
+const overlap=(a:Box,b:Box)=>Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
+
+export function placeCompactTitles(tasks:TaskLabelRect[]):CompactTitlePosition[]{
+ const compact=tasks.filter(t=>t.width<160).sort((a,b)=>a.y-b.y||a.x-b.x||a.id.localeCompare(b.id));
+ const used:Box[]=[];
+ return compact.map(t=>{
+  const labelWidth=Math.min(194,Math.max(120,t.title.length*7.3+16)),labelHeight=54;
+  // Only small, predictable nudges. Some overlap is intentional in dense areas.
+  const candidates:[number,number,number][]=[
+   [0,-labelHeight-4,0],[0,t.height+5,15],
+   [-18,-labelHeight-4,6],[18,-labelHeight-4,6],
+   [-18,t.height+5,21],[18,t.height+5,21],
+   [0,-labelHeight-18,28],[0,t.height+18,33]
+  ];
+  let best={left:0,top:-labelHeight-4},bestScore=Infinity;
+  for(const [dx,dy,bias] of candidates){
+   const box={x:Math.max(0,t.x+dx),y:Math.max(82,t.y+dy),width:labelWidth,height:labelHeight};
+   const labelObstruction=used.reduce((sum,other)=>sum+overlap(box,other),0);
+   const bodyObstruction=tasks.filter(other=>other.id!==t.id).reduce((sum,other)=>sum+overlap(box,other),0);
+   const score=bias+labelObstruction*.18+bodyObstruction*.07;
+   if(score<bestScore){bestScore=score;best={left:box.x-t.x,top:box.y-t.y}}
   }
-  let best=candidateBoxes[0],bestScore=Infinity;
-  for(const box of candidateBoxes){
-   let collisions=0;
-   for(const other of occupied){
-    if(intersects(box,other,5))collisions+=10000+overlapArea(box,other)*10;
-   }
-   const distance=Math.hypot(clamp(ownCenterX,box.x,box.x+box.width)-ownCenterX,clamp(ownCenterY,box.y,box.y+box.height)-ownCenterY);
-   const score=collisions+distance;
-   if(score<bestScore){best=box;bestScore=score}
-   if(score===0)break;
-  }
-  occupied.push(best);
-  const attachX=clamp(ownCenterX,best.x,best.x+best.width),attachY=clamp(ownCenterY,best.y,best.y+best.height);
-  placed.push({id:task.id,...best,anchorX:ownCenterX,anchorY:ownCenterY,attachX,attachY});
- }
- return placed;
+  used.push({x:t.x+best.left,y:t.y+best.top,width:labelWidth,height:labelHeight});
+  return {id:t.id,...best};
+ });
 }

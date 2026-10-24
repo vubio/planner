@@ -252,21 +252,17 @@ main>header h1{margin:4px 0}
 
 /* Task titles occupy collision-tested floating cards when blocks are narrow or overlap.
    The main blocks remain fully interactive; labels have their own drag targets. */
-.task.callout-task .task-content,.task.callout-task .task-tags{display:none}
-.task-label-guides{position:absolute;left:0;top:0;z-index:7;pointer-events:none;overflow:visible}
+/* Keep compact labels as plain nearby text rather than separate-looking task cards. */
+.task.compact .task-content{position:absolute;bottom:auto;top:-58px;left:0;min-width:120px;max-width:194px;width:max-content;height:auto;padding:2px 4px;background:transparent;border:0;border-radius:0;box-shadow:none;cursor:default;pointer-events:auto;overflow:visible}
+.task.compact .task-content:hover{background:transparent;box-shadow:none}
+.task.compact .task-content strong{font-size:13px;line-height:1.27;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;text-overflow:ellipsis;max-width:185px;text-shadow:0 1px 2px #fff,0 -1px 2px #fff}
+.task.compact .task-content small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:185px;margin-top:3px;text-shadow:0 1px 2px #fff}
+.task.compact .task-tags{bottom:auto;top:calc(100% + 4px);left:0;right:auto;z-index:8}
+.task-title-click{cursor:text;border-radius:3px}
+.task-title-click:hover{background:#ffffffa8;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.task-inline-title-input{display:block;width:100%;min-width:90px;max-width:100%;padding:3px 5px;font-size:14px;line-height:1.35;font-weight:800;border:1px solid #47856d;border-radius:4px;background:#fff;color:#1d392b;box-shadow:0 1px 6px #193b3140}
+.task.compact .task-inline-title-input{width:185px;max-width:185px;font-size:13px}
 .canvas .ruler{z-index:25}
-.task-floating-label{position:absolute;z-index:9;display:flex;flex-direction:column;gap:4px;justify-content:center;min-height:70px;padding:8px 10px 7px;background:#fffefa;box-shadow:0 3px 12px #233b2a2b;border:1px solid #c7d8c6;border-left:5px solid;border-radius:7px;color:#203b2b;cursor:grab;touch-action:none;user-select:none;overflow:hidden}
-.task-floating-label:hover,.task-floating-label.selected{z-index:12;border-color:#66896d;box-shadow:0 5px 15px #1f3d3050}
-.task-floating-label:active{cursor:grabbing}
-.task-floating-heading{display:flex;align-items:flex-start;gap:6px;min-width:0}
-.task-floating-heading i{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
-.task-floating-heading strong{font-size:14px;line-height:1.27;font-weight:850;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
-.task-floating-label small{font-size:11px;line-height:1.25;font-weight:750;color:#4d674f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.task-floating-tags{display:flex;gap:4px;min-width:0;overflow:hidden}
-.task-floating-tags .attached-tag{font-size:10px;padding:2px 5px;max-width:105px;min-height:18px}
-.task-floating-label.done{opacity:.72;background:#f5faf4}
-.task-floating-label.failed{opacity:.85;background:#fff2f1;border-color:#d3a2a0}
-.task-floating-label.failed .task-floating-heading strong{text-decoration:line-through;text-decoration-color:#ae5258;text-decoration-thickness:2px}
 
 /* Custom right-click actions; right-drag still pans the timeline. */
 .canvas-context-menu{position:fixed;z-index:38;width:214px;max-height:calc(100vh - 16px);overflow:auto;padding:7px;background:#fffefa;border:1px solid #b6c9b7;border-radius:10px;box-shadow:0 12px 36px #233c2f50;color:#2b4938}
