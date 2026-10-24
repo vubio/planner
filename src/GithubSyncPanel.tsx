@@ -14,7 +14,7 @@ function storedToken(){try{return localStorage.getItem(GITHUB_TOKEN_KEY)||sessio
 function clock(iso:string){const d=new Date(iso);return Number.isFinite(d.getTime())?d.toLocaleString([],{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}):'recently'}
 function exportBrowserSafetyCopy(content:string){const blob=new Blob([content],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`vubio-planner-before-github-restore-${new Date().toISOString().slice(0,10)}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
 
-export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{loaded:boolean,revision:number,dirty:boolean,localSaveError:boolean}){
+export default function GithubSyncPanel({loaded,revision,dirty,localSaveError,manualSaveRequest}:{loaded:boolean,revision:number,dirty:boolean,localSaveError:boolean,manualSaveRequest:number}){
  const [status,setStatus]=useState<SyncStatus>('checking'),[detail,setDetail]=useState(''),[open,setOpen]=useState(false);
  const [token,setToken]=useState(storedToken),[draft,setDraft]=useState(''),[remember,setRemember]=useState(()=>{try{return !sessionStorage.getItem(GITHUB_TOKEN_KEY)}catch{return true}});
  const [account,setAccount]=useState(''),[lastSaved,setLastSaved]=useState(''),[connecting,setConnecting]=useState(false);
@@ -23,13 +23,14 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
  const tokenRef=useRef(token);tokenRef.current=token;
  const dirtyRef=useRef(dirty);dirtyRef.current=dirty;
  const saveTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+ const handledManualRequest=useRef(0);
  const isMounted=useRef(true);
 
  const savedLabel=lastSaved?`GitHub saved · ${clock(lastSaved)}`:'Saved to GitHub';
  const labels:Record<SyncStatus,string>={
   checking:'Checking GitHub…',empty:'GitHub database is empty',
   'needs-upload':'Upload this planner to GitHub',synced:savedLabel,
-  pending:'Not yet saved to GitHub',saving:'Saving to GitHub…',
+  pending:token?'Not yet saved to GitHub':'GitHub needs permission on this device',saving:'Saving to GitHub…',
   'remote-newer':'Newer GitHub copy available',conflict:'GitHub sync needs attention',
   offline:'GitHub offline · local copy safe',error:'GitHub save needs attention'
  };
@@ -81,7 +82,7 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
   state.current.checking=true;
   if(statusRef.current!=='pending'&&statusRef.current!=='saving')setStatus('checking');
   try{
-   const remote=await fetchGithubDatabase();
+   const remote=await fetchGithubDatabase(tokenRef.current||undefined);
    if(!isMounted.current)return;
    const existing=readLocalDatabase(),localHash=await contentFingerprint(existing);
    state.current.remote=remote;
@@ -133,6 +134,7 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
 
  async function uploadBrowser(manual:boolean){
   if(state.current.pushing||localSaveError)return;
+  if(manual&&saveTimer.current){clearTimeout(saveTimer.current);saveTimer.current=null}
   if(!manual&&!state.current.ready)return;
   const key=tokenRef.current;
   if(!key){setStatus('pending');setDetail('Connect GitHub once on this computer to allow saving changes.');if(manual)setOpen(true);return}
@@ -193,7 +195,7 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
  async function manualUpload(){
   if(state.current.remote){
    if(!confirm('Replace the GitHub planner with this browser’s version? The previous version remains recoverable through Git history.'))return;
-   try{state.current.remote=await fetchGithubDatabase()}catch(e:any){setDetail(e?.message||'Cannot check the current GitHub version');return}
+   try{state.current.remote=await fetchGithubDatabase(tokenRef.current||undefined)}catch(e:any){setDetail(e?.message||'Cannot check the current GitHub version');return}
   }else if(!confirm('Upload this browser’s complete planner database to GitHub for the first time?'))return;
   await uploadBrowser(true);
  }
@@ -203,7 +205,7 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
   try{
    // Always refresh before restore: a concurrent save may have made the
    // previous cached SHA stale, especially after a 409 conflict.
-   const latest=await fetchGithubDatabase();
+   const latest=await fetchGithubDatabase(tokenRef.current||undefined);
    state.current.remote=latest;
    if(!latest){setStatus('needs-upload');setDetail('GitHub has no database to load yet. The browser database is untouched.');return}
    await restoreFromGithub(latest);
@@ -212,6 +214,22 @@ export default function GithubSyncPanel({loaded,revision,dirty,localSaveError}:{
 
  useEffect(()=>{isMounted.current=true;return()=>{isMounted.current=false;if(saveTimer.current)clearTimeout(saveTimer.current)}},[]);
  useEffect(()=>{if(loaded)void inspectGithub()},[loaded]);
+ useEffect(()=>{
+  if(!loaded||!manualSaveRequest||handledManualRequest.current===manualSaveRequest)return;
+  handledManualRequest.current=manualSaveRequest;
+  if(localSaveError){setOpen(true);return}
+  if(!tokenRef.current){
+   setOpen(true);setStatus('pending');
+   setDetail('Your current planner is saved in this browser. This laptop needs its own GitHub authorization before Save now can upload it. Connect below; no data will be replaced.');
+   return;
+  }
+  if(!state.current.ready||state.current.checking||state.current.pushing||dirty){
+   setOpen(true);
+   setDetail('Your browser copy is safe. Please review the GitHub status before uploading; a newer remote copy will never be silently overwritten.');
+   return;
+  }
+  void uploadBrowser(true);
+ },[manualSaveRequest,loaded,dirty,localSaveError]);
  useEffect(()=>{
   if(!loaded||!state.current.ready)return;
   if(revision>0){

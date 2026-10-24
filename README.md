@@ -15,6 +15,7 @@ This repository currently deploys GitHub Pages from **main / (root)**. The root 
 - Preparation spans: Shift-drag left on a task, drag the faint span, or enter minutes in task details.
 - Shift-click tasks to select several; right-click to group/ungroup, add tags or sticky notes, edit, duplicate, connect, or delete. Right-drag still pans. Grouped items move together, and grouping survives browser/GitHub saves.
 - The color palette colors the next task when nothing is selected; with selected tasks it recolors those tasks immediately. New task dialogs focus and select the default title for immediate typing.
+- Titles of narrow or overlapping task blocks move into high-contrast, collision-aware floating labels with guide lines to their tasks. Drag a label to move its task; double-click to edit it.
 - Double-click to create and edit tasks, notes, checklists, priorities, colors, and outcomes.
 - Solid/dashed branching arrows. Select a task → Connect → select its successor, or Alt-drag between tasks. Cycles are rejected.
 - Failed/stopped tasks fade downstream steps. Done tasks have a completion marker.
@@ -25,6 +26,8 @@ This repository currently deploys GitHub Pages from **main / (root)**. The root 
 ## Data storage — browser first, optional GitHub sync
 
 Every change is saved in **localStorage on the current browser first**. The floating status button in the lower right shows whether the database is also current on GitHub. A locally saved edit is **not** necessarily a successful GitHub save; wait for the green **GitHub saved** status before switching devices.
+
+**Save now · GitHub** saves to this browser and then attempts a GitHub upload. If this computer is not yet authorized, it opens GitHub sync settings. Each browser/device needs its own write token; being signed into GitHub in a different browser is not sufficient. If the browser and GitHub contain conflicting versions, the planner asks you to review them before replacing either copy.
 
 When enabled, GitHub saves the complete task database, connections, attached labels, sticky notes and weekly archives as `planner.json` on the separate [`planner-data` branch](https://github.com/vubio/planner/tree/planner-data). The website continues to deploy from `main`, so database updates do not redeploy the website. The branch and database are **publicly readable** because this repository is public. Do not put confidential research data into it.
 
