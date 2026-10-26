@@ -1,12 +1,25 @@
 /** Gentle compact-title placement: nearby text, never detached callout cards. */
-export type TaskLabelRect={id:string,x:number,y:number,width:number,height:number,title:string};
+export type TaskLabelRect={id:string,x:number,y:number,width:number,height:number,title:string,layout?:TaskTitleMode};
 export type CompactTitlePosition={id:string,left:number,top:number};
+export type TaskTitleMode='standard'|'vertical'|'compact';
+export type TaskTitleFit={width:number,height:number,title:string,hasProject?:boolean,checklistCount?:number};
 type Box={x:number,y:number,width:number,height:number};
+
+/** Put titles inside tall narrow blocks when their text can reasonably wrap.
+ * Only the time range needs to move outside those blocks. */
+export function taskTitleMode(task:TaskTitleFit):TaskTitleMode{
+ if(task.width>=160)return 'standard';
+ if(task.width<64)return 'compact';
+ const charsPerLine=Math.max(1,Math.floor((task.width-16)/7.1));
+ const lines=Math.max(1,Math.ceil(task.title.trim().length/charsPerLine));
+ const needed=54+lines*17+(task.hasProject?22:0)+(task.checklistCount?26:0);
+ return task.height>=needed?'vertical':'compact';
+}
 
 const overlap=(a:Box,b:Box)=>Math.max(0,Math.min(a.x+a.width,b.x+b.width)-Math.max(a.x,b.x))*Math.max(0,Math.min(a.y+a.height,b.y+b.height)-Math.max(a.y,b.y));
 
 export function placeCompactTitles(tasks:TaskLabelRect[]):CompactTitlePosition[]{
- const compact=tasks.filter(t=>t.width<160).sort((a,b)=>a.y-b.y||a.x-b.x||a.id.localeCompare(b.id));
+ const compact=tasks.filter(t=>t.layout?t.layout==='compact':t.width<160).sort((a,b)=>a.y-b.y||a.x-b.x||a.id.localeCompare(b.id));
  const used:Box[]=[];
  return compact.map(t=>{
   const labelWidth=Math.min(194,Math.max(120,t.title.length*7.3+16)),labelHeight=54;

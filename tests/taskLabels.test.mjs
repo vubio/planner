@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {placeCompactTitles} from '../src/taskLabels.ts';
+import {placeCompactTitles,taskTitleMode} from '../src/taskLabels.ts';
 
 const task=(id,x,y,width=18,height=50)=>({id,x,y,width,height,title:id});
 
@@ -29,4 +29,22 @@ test('compact titles do not move when another wide task overlaps a block',()=>{
 test('near-top compact titles stay below the sticky time ruler',()=>{
  const titles=placeCompactTitles([task('a',2,88),task('b',60,92)]);
  for(const title of titles){const original=title.id==='a'?task('a',2,88):task('b',60,92);assert.ok(original.y+title.top>=82)}
+});
+
+test('tall narrow screenshot tasks keep their title inside and only time outside',()=>{
+ assert.equal(taskTitleMode({width:76,height:176,title:'Library Checkup'}),'vertical');
+ assert.equal(taskTitleMode({width:150,height:145,title:'AA+Retinol+Palmitate'}),'vertical');
+});
+
+test('truly tiny or short blocks keep their nearby external title',()=>{
+ assert.equal(taskTitleMode({width:22,height:176,title:'Library Checkup'}),'compact');
+ assert.equal(taskTitleMode({width:76,height:66,title:'Library Checkup'}),'compact');
+ assert.equal(taskTitleMode({width:76,height:88,title:'Long procedure description',checklistCount:3,hasProject:true}),'compact');
+ assert.equal(taskTitleMode({width:210,height:54,title:'Short task'}),'standard');
+});
+
+test('compact-title positions skip tasks whose title fits vertically inside',()=>{
+ const inside={...task('tall',120,260,76,176),title:'Library Checkup',layout:'vertical'};
+ const tiny={...task('tiny',280,280,18,44),title:'Tiny',layout:'compact'};
+ assert.deepEqual(placeCompactTitles([inside,tiny]).map(t=>t.id),['tiny']);
 });
