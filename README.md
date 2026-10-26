@@ -20,7 +20,7 @@ This repository currently deploys GitHub Pages from **main / (root)**. The root 
 - Solid/dashed branching arrows. Select a task → Connect → select its successor, or Alt-drag between tasks. Cycles are rejected.
 - Failed/stopped tasks fade downstream steps. Done tasks have a completion marker.
 - Project, connected-sequence, individual-task, color, priority and tag filters; search across all stored tasks.
-- Compact canvas sticky notes for Ask & discuss, task-attached labels, and scratchpad.
+- Compact canvas sticky notes for Ask & discuss, task-attached labels, and scratchpad. Notes expand after 5 seconds of continuous hover, or immediately on click; dragging does not expand them.
 - Browser autosave, opt-in GitHub autosync, undo, manual snapshots, automatic week-rollover snapshots, JSON backup import/export, standalone HTML snapshot exports.
 
 ## Data storage — browser first, optional GitHub sync

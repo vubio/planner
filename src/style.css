@@ -173,18 +173,18 @@ main>header h1{margin:4px 0}
 .canvas-tools .note-tool.active{background:#f8df8b;border-color:#c7a044;box-shadow:0 0 0 2px #f7e5b7}
 .floating-note{position:absolute;z-index:8;width:112px;height:39px;max-height:39px;overflow:hidden;cursor:grab;user-select:none;touch-action:none;padding:4px 6px;border:1px solid #c6a85b;border-left:3px solid #ab8a42;border-radius:5px 8px 8px 5px;box-shadow:0 2px 6px #514b2c30;color:#3b4038;transition:box-shadow .17s,width .17s,max-height .17s;}
 .floating-note::after{content:'';position:absolute;right:8px;bottom:0;width:16px;height:7px;background:#0000000b;clip-path:polygon(100% 0,0 100%,100% 100%)}
-.floating-note:hover,.floating-note.expanded,.floating-note:focus-within{z-index:19;width:260px;height:auto;max-height:340px;min-height:110px;padding:9px 12px;overflow:auto;cursor:grab;box-shadow:0 9px 28px #3d382d4d;border-color:#ac924e}
+.floating-note.expanded,.floating-note:focus-within{z-index:19;width:260px;height:auto;max-height:340px;min-height:110px;padding:9px 12px;overflow:auto;cursor:grab;box-shadow:0 9px 28px #3d382d4d;border-color:#ac924e}
 .floating-note:active{cursor:grabbing}
 .floating-note.note-done{opacity:.66}
 .floating-note-head{display:flex;align-items:center;gap:3px;min-width:0;height:14px;color:#786c4f}
 .floating-note-head b{display:none;font-size:9px;font-weight:800;letter-spacing:.55px;flex:1;white-space:nowrap}
-.floating-note:hover .floating-note-head b,.floating-note.expanded .floating-note-head b,.floating-note:focus-within .floating-note-head b{display:block}
+.floating-note.expanded .floating-note-head b,.floating-note:focus-within .floating-note-head b{display:block}
 .floating-note-head button{width:16px;height:16px;margin-left:auto;padding:0;border:1px solid #9578497d;background:#ffffffa8;font-size:11px;font-weight:800;flex-shrink:0}
 .floating-note p{margin:1px 0 0;font-size:11px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.floating-note:hover p,.floating-note.expanded p,.floating-note:focus-within p{margin-top:6px}
-.floating-note:hover p,.floating-note.expanded p,.floating-note:focus-within p{white-space:pre-wrap;overflow-wrap:anywhere;max-height:none;font-size:13px}
+.floating-note.expanded p,.floating-note:focus-within p{margin-top:6px}
+.floating-note.expanded p,.floating-note:focus-within p{white-space:pre-wrap;overflow-wrap:anywhere;max-height:none;font-size:13px}
 .floating-note small{display:none;font-size:10px;color:#6f705d;margin-top:10px}
-.floating-note:hover small,.floating-note.expanded small,.floating-note:focus-within small{display:block}
+.floating-note.expanded small,.floating-note:focus-within small{display:block}
 .note-inbox{padding:0 14px 12px}
 .note-inbox form{margin-top:6px}
 .note-inbox form input{font-size:12px}
