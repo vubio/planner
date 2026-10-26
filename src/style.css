@@ -276,3 +276,45 @@ main>header h1{margin:4px 0}
 .canvas-context-menu kbd{margin-left:auto;padding:1px 5px;border:1px solid #c7d5c9;border-radius:4px;font-size:10px;background:#f1f5ef;color:#627868}
 .menu-symbol{display:inline-flex;align-items:center;justify-content:center;font-size:16px;width:15px;height:15px;color:#50755b}
 .context-menu-separator{height:1px;background:#e7ebe3;margin:6px 4px}
+
+/* Optional project names become distinctive, consistent-color chips. */
+.task .task-meta{display:flex;align-items:center;margin-bottom:8px;min-width:0}
+.project-chip{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 9px;border-radius:5px;font-size:11px;font-weight:850;line-height:1.25;letter-spacing:.3px;text-transform:none;color:#fff;box-shadow:0 1px 4px #142f2b30}
+.task.compact.has-project .task-meta{display:flex;margin:0 0 3px}
+.task.compact.has-project .task-content{transform:translateY(-18px)}
+.task.compact .project-chip{font-size:10px;padding:2px 6px;box-shadow:none}
+
+/* Actionable checklist indicator on the canvas. */
+.task-time-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:5px;min-width:0}
+.task .task-time-row .task-time-text{display:inline;max-width:100%;font-size:11px;line-height:1.4;font-weight:750;margin:0;white-space:nowrap}
+.task-checklist-trigger{display:inline-flex;align-items:center;gap:4px;flex-shrink:0;padding:4px 8px;border:1px solid #d6a958;border-radius:6px;background:#fff0bc;color:#6e4d0f;font-size:12px;font-weight:900;line-height:1.15;box-shadow:0 1px 4px #926a2035;cursor:pointer;touch-action:manipulation;white-space:nowrap}
+.task-checklist-trigger:hover,.task-checklist-trigger:focus-visible{background:#ffdf8a;border-color:#ad7e2e;box-shadow:0 1px 7px #90611f65}
+.task-checklist-trigger.checklist-complete{background:#dceede;border-color:#9bc8a1;color:#28603c;box-shadow:none}
+.task.compact .task-time-row{gap:4px;flex-wrap:wrap}
+.task.compact .task-time-row .task-time-text{font-size:10px;white-space:normal;overflow-wrap:anywhere}
+.task.compact .task-checklist-trigger{font-size:10px;padding:2px 5px;gap:3px}
+.task.compact .task-checklist-trigger svg{width:12px;height:12px}
+
+/* Quick checklist editor stays outside the scroll-clipped timeline. */
+.task-checklist-popover{position:fixed;z-index:65;width:min(338px,calc(100vw - 24px));max-height:min(360px,calc(100vh - 24px));overflow:auto;padding:13px;background:#fffefa;border:1px solid #c2d2c0;border-radius:11px;box-shadow:0 14px 42px #142c2460;color:#294331}
+.quick-checklist-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;border-bottom:1px solid #e1e8dc;padding-bottom:10px}
+.quick-checklist-heading>div{min-width:0;display:flex;flex-direction:column;gap:3px}
+.quick-checklist-heading span{font-size:9px;font-weight:850;letter-spacing:1px;color:#80977c}
+.quick-checklist-heading strong{font-size:14px;line-height:1.3;overflow-wrap:anywhere}
+.quick-checklist-heading button{padding:3px;flex-shrink:0}
+.quick-checklist-progress{display:flex;align-items:center;gap:5px;color:#697d67;padding:10px 0 7px;font-size:11px}
+.quick-checklist-progress b{font-weight:900;font-size:13px;color:#496c47}
+.quick-checklist-list{display:flex;flex-direction:column;gap:5px}
+.quick-checklist-empty{font-size:12px;color:#869a80}
+.quick-checklist-item{display:flex;align-items:center;gap:7px;border-radius:7px;padding:3px 4px;background:#f5f8f2}
+.quick-checklist-item input[type=checkbox]{width:16px;height:16px;cursor:pointer}
+.quick-checklist-item input:not([type=checkbox]){flex:1;min-width:0;border:1px solid transparent;background:transparent;padding:6px 3px;font-size:12px;font-weight:600;color:#304838}
+.quick-checklist-item input:not([type=checkbox]):focus{border-color:#86ad8e;background:white}
+.quick-checklist-item.completed input:not([type=checkbox]){color:#869483;text-decoration:line-through;text-decoration-thickness:1px}
+.quick-checklist-item button{padding:3px;color:#99a399;opacity:.7}
+.quick-checklist-item button:hover{color:#a74a4a;opacity:1}
+.quick-checklist-add{display:flex;gap:5px;border-top:1px solid #e1e8dc;margin-top:12px;padding-top:11px}
+.quick-checklist-add input{flex:1;min-width:0;padding:7px 8px;font-size:12px}
+.quick-checklist-add button{background:#375d46;color:#fff;font-size:11px;font-weight:800;padding:7px 9px}
+.quick-checklist-add button:disabled{opacity:.45;cursor:not-allowed}
+.quick-checklist-hint{margin-top:10px;font-size:10px;color:#83927f;line-height:1.45}

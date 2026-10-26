@@ -16,6 +16,8 @@ This repository currently deploys GitHub Pages from **main / (root)**. The root 
 - Shift-click tasks to select several; right-click to group/ungroup, add tags or sticky notes, edit, duplicate, connect, or delete. Right-drag still pans. Grouped items move together, and grouping survives browser/GitHub saves.
 - The color palette colors the next task when nothing is selected; with selected tasks it recolors those tasks immediately. New task dialogs focus and select the default title for immediate typing.
 - Wide task titles remain inside their blocks; narrow task titles stay as lightweight text immediately beside the block, with only small nudges to reduce crowding (some overlap is allowed). Single-click a visible title to rename it directly on the canvas, Enter to save, or Escape to cancel. Drag the block itself to move the task; double-click elsewhere on the block for its detailed editor.
+- Tasks with checklist steps display a highlighted, clickable completion counter (for example, 0/2); click to check off, rename, add, or remove steps in a quick popup without opening full task details.
+- Project names are optional and blank for new tasks. Named projects show a prominent, color-coded chip; older tasks with the placeholder "New project" are treated as unassigned until edited.
 - Double-click to create and edit tasks, notes, checklists, priorities, colors, and outcomes.
 - Solid/dashed branching arrows. Select a task → Connect → select its successor, or Alt-drag between tasks. Cycles are rejected.
 - Failed/stopped tasks fade downstream steps. Done tasks have a completion marker.
