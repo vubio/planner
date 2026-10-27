@@ -7,13 +7,18 @@ export function groupMovementIds(tasks:{id:string,groupId?:string}[],selected:st
  return tasks.filter(t=>selectedSet.has(t.id)||(t.groupId&&groupIds.has(t.groupId))).map(t=>t.id);
 }
 /** Limit the shared drag offset using the TOPMOST moving task, not the grabbed one.
- * If some tasks were already above the visible edge, prevent making them worse
- * without snapping them unexpectedly into view. */
-export function boundedGroupDragY(tasks:readonly {id:string,y:number}[],movingIds:ReadonlySet<string>,requestedDy:number,visibleTopY:number):number{
+ * Already out-of-bounds positions are never made worse or snapped unexpectedly. */
+export function boundedGroupDragY(tasks:readonly {id:string,y:number}[],movingIds:ReadonlySet<string>,requestedDy:number,canvasTopY:number):number{
  const positions=tasks.filter(task=>movingIds.has(task.id)).map(task=>task.y);
  if(!positions.length)return requestedDy;
  const topmost=Math.min(...positions);
- return Math.max(requestedDy,Math.min(visibleTopY,topmost)-topmost);
+ return Math.max(requestedDy,Math.min(canvasTopY,topmost)-topmost);
+}
+/** Smoothly scroll the timeline when a dragged pointer approaches its upper or lower edge. */
+export function verticalEdgeScrollSpeed(pointerY:number,top:number,bottom:number,threshold=72,maxStep=19):number{
+ if(pointerY<top+threshold)return -Math.min(maxStep,Math.max(0,(top+threshold-pointerY)/threshold*maxStep));
+ if(pointerY>bottom-threshold)return Math.min(maxStep,Math.max(0,(pointerY-(bottom-threshold))/threshold*maxStep));
+ return 0;
 }
 export function validData(d:any):boolean {
  if(!d||!Array.isArray(d.tasks)||!Array.isArray(d.edges)||!Array.isArray(d.questions)||typeof d.notes!=='string')return false;

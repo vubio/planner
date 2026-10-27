@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds,boundedGroupDragY} from '../src/model.ts';
+import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds,boundedGroupDragY,verticalEdgeScrollSpeed} from '../src/model.ts';
 const task={id:'a',title:'<script>alert(1)</script>',start:'2026-10-19T14:45',duration:15,prep:150,y:40,height:66,color:'#628875',project:'Test',priority:'High',status:'Planned',notes:'A & B',checklist:[{text:'<unsafe>',done:false}],floating:false};
 const data={tasks:[task],edges:[],questions:[],notes:'notes'};
 test('task groups persist in a valid saved planner without breaking older tasks',()=>{
@@ -32,6 +32,23 @@ test('group drag uses the scrolled viewport edge and preserves already hidden po
  assert.equal(boundedGroupDragY(tasks,new Set(['upper','lower']),-200,-100),-160);
  assert.equal(boundedGroupDragY([{id:'upper',y:-35},{id:'lower',y:120}],new Set(['upper','lower']),-80,12),0);
  assert.equal(boundedGroupDragY([{id:'upper',y:-35},{id:'lower',y:120}],new Set(['upper','lower']),60,12),60);
+});
+test('expanded canvas allows three screens of upward motion while keeping groups inside real bounds',()=>{
+ const padding=650*3,canvasTop=12-padding;
+ const members=[{id:'cell-seeded',y:160},{id:'viability',y:15}];
+ const ids=new Set(members.map(t=>t.id));
+ assert.equal(boundedGroupDragY(members,ids,-600,canvasTop),-600);
+ assert.equal(boundedGroupDragY(members,ids,-3000,canvasTop),canvasTop-15);
+ assert.equal(members[0].y-members[1].y,145);
+});
+test('drag edge auto-scroll has a quiet center and speeds up near edges',()=>{
+ const top=180,bottom=800;
+ assert.equal(verticalEdgeScrollSpeed(500,top,bottom),0);
+ assert.equal(verticalEdgeScrollSpeed(top+72,top,bottom),0);
+ assert.ok(verticalEdgeScrollSpeed(top+10,top,bottom)<0);
+ assert.ok(verticalEdgeScrollSpeed(bottom-10,top,bottom)>0);
+ assert.equal(verticalEdgeScrollSpeed(top-100,top,bottom),-19);
+ assert.equal(verticalEdgeScrollSpeed(bottom+100,top,bottom),19);
 });
 test('task quick action cycles planned to done to failed to planned',()=>{
  const statuses=['Planned'];for(let i=0;i<3;i++)statuses.push(nextTaskStatus(statuses[i]));
