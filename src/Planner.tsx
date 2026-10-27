@@ -1,5 +1,5 @@
 'use client';
-import {validData,reaches,recordHTML,nextTaskStatus,groupMovementIds} from './model';
+import {validData,reaches,recordHTML,nextTaskStatus,groupMovementIds,boundedGroupDragY} from './model';
 import {useEffect,useRef,useState} from 'react';
 import {Plus,Search,ChevronLeft,ChevronRight,Check,ArrowUpRight,SlidersHorizontal,Archive,Link2,Download,StickyNote,MessageCircle,CalendarDays,Undo2,RotateCcw,X,FlaskConical,Maximize2,Minimize2,PanelTopClose,PanelTopOpen,ListChecks,Tag as TagIcon} from 'lucide-react';
 import GithubSyncPanel from './GithubSyncPanel';
@@ -256,7 +256,7 @@ export default function Planner(){
    if(mode==='move'){
     const proposed=fromX(x(new Date(t.start))+dx);
     const start=ev.ctrlKey?snapHalfHour(proposed):proposed;
-    p={start:local(start),y:Math.max(12-verticalPad,t.y+dy)};
+    p={start:local(start)};
     setSnapPreview(ev.ctrlKey?start:null);
    }
    if(mode==='duration')p={duration:Math.max(15,Math.round((fromX(x(new Date(new Date(t.start).getTime()+t.duration*60000))+dx).getTime()-new Date(t.start).getTime())/60000/15)*15)};
@@ -271,7 +271,13 @@ export default function Planner(){
    if(mode==='prep')p={prep:Math.max(0,Math.round((t.prep-dx/px*60)/15)*15)};
    if(mode==='move'){
     const delta=new Date(p.start||t.start).getTime()-new Date(t.start).getTime();
-    setData({...original,tasks:original.tasks.map(a=>movingIds.has(a.id)?{...a,start:local(new Date(new Date(a.start).getTime()+delta)),y:Math.max(12-verticalPad,a.y+dy)}:a)});
+    // The canvas contains a tall scroll buffer. At the default scroll position,
+    // negative task y values sit behind the sticky time ruler and cannot be clicked.
+    // Constrain the *shared* offset to the currently visible top edge so dragging
+    // a lower selected item does not strand an upper selected item above the view.
+    const visibleTopY=(scroll.current?.scrollTop??verticalPad)-verticalPad+12;
+    const sharedDy=boundedGroupDragY(original.tasks,movingIds,dy,visibleTopY);
+    setData({...original,tasks:original.tasks.map(a=>movingIds.has(a.id)?{...a,start:local(new Date(new Date(a.start).getTime()+delta)),y:a.y+sharedDy}:a)});
    }else setData({...original,tasks:original.tasks.map(a=>a.id===t.id?{...a,...p}:a)});
   };
   const finish=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',finish);window.removeEventListener('pointercancel',cancel);setSnapPreview(null);if(moved){undo.current.push(original);setDirty(true)}else if(shiftSelecting)selectTask(t.id,true);else if(preservedMultiple)selectTask(t.id)};

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds} from '../src/model.ts';
+import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds,boundedGroupDragY} from '../src/model.ts';
 const task={id:'a',title:'<script>alert(1)</script>',start:'2026-10-19T14:45',duration:15,prep:150,y:40,height:66,color:'#628875',project:'Test',priority:'High',status:'Planned',notes:'A & B',checklist:[{text:'<unsafe>',done:false}],floating:false};
 const data={tasks:[task],edges:[],questions:[],notes:'notes'};
 test('task groups persist in a valid saved planner without breaking older tasks',()=>{
@@ -15,6 +15,23 @@ test('dragging one grouped task moves every member, preserving other task groups
  assert.deepEqual(groupMovementIds(tasks,['a']),['a','b']);
  assert.deepEqual(groupMovementIds(tasks,['a','c']),['a','b','c','d']);
  assert.deepEqual(groupMovementIds(tasks,['e']),['e']);
+});
+test('dragging a lower selected task cannot hide an upper selected task behind the ruler',()=>{
+ const tasks=[{id:'seeded',y:210},{id:'viability',y:32},{id:'unselected',y:5}];
+ const selected=new Set(['seeded','viability']);
+ const dy=boundedGroupDragY(tasks,selected,-140,12);
+ assert.equal(dy,-20);
+ assert.equal(tasks[0].y+dy,190);
+ assert.equal(tasks[1].y+dy,12);
+ assert.equal(tasks[2].y,5);
+ // A single dragged item may still move until its own top reaches the boundary.
+ assert.equal(boundedGroupDragY(tasks,new Set(['seeded']),-140,12),-140);
+});
+test('group drag uses the scrolled viewport edge and preserves already hidden positions',()=>{
+ const tasks=[{id:'upper',y:60},{id:'lower',y:220}];
+ assert.equal(boundedGroupDragY(tasks,new Set(['upper','lower']),-200,-100),-160);
+ assert.equal(boundedGroupDragY([{id:'upper',y:-35},{id:'lower',y:120}],new Set(['upper','lower']),-80,12),0);
+ assert.equal(boundedGroupDragY([{id:'upper',y:-35},{id:'lower',y:120}],new Set(['upper','lower']),60,12),60);
 });
 test('task quick action cycles planned to done to failed to planned',()=>{
  const statuses=['Planned'];for(let i=0;i<3;i++)statuses.push(nextTaskStatus(statuses[i]));
