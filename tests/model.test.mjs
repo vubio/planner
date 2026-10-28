@@ -87,5 +87,19 @@ test('canvas Ask & discuss notes persist with optional anchor, color, and vertic
  assert.match(html,/ASK \/ DISCUSS/);
  assert.match(html,/Ask B about reagent C/);
 });
+test('reserved time blocks validate and persist in complete snapshots without breaking old databases',()=>{
+ const band={id:'reserved-1',title:'Lab meeting',start:'2026-10-19T13:00',end:'2026-10-19T14:00',color:'#687c91',notes:'Only passive incubation can run'};
+ const withBand={...data,timeBlocks:[band]};
+ assert.equal(validData(data),true,'pre-existing saved files without timeBlocks stay readable');
+ assert.equal(validData(withBand),true);
+ assert.equal(validData({...withBand,timeBlocks:[band,band]}),false,'duplicate blocks rejected');
+ assert.equal(validData({...withBand,timeBlocks:[{...band,end:band.start}]}),false,'zero duration rejected');
+ assert.equal(validData({...withBand,timeBlocks:[{...band,start:'not a date'}]}),false);
+ assert.equal(validData({...withBand,timeBlocks:[{...band,color:'javascript:alert(1)'}]}),false);
+ const html=recordHTML(withBand,new Date('2026-10-19T00:00'));
+ assert.match(html,/Lab meeting/);
+ assert.match(html,/Only passive incubation can run/);
+ assert.match(html,/Reserved time/);
+});
 test('graph traversal detects branches and loops without hanging',()=>{const edges=[{from:'a',to:'b'},{from:'a',to:'c'},{from:'c',to:'d'}];assert.equal(reaches(edges,'a','d'),true);assert.equal(reaches(edges,'d','a'),false);assert.equal(reaches([...edges,{from:'d',to:'a'}],'d','b'),true)});
 test('archived HTML is standalone and escapes task input',()=>{const html=recordHTML(data,new Date('2026-10-19T00:00'));assert.match(html,/<svg/);assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);assert.match(html,/150 min preparation/);assert.match(html,/A &amp; B/);assert.equal(dateKey(new Date(2026,9,19)),'2026-10-19')});

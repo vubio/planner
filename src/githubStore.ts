@@ -30,7 +30,7 @@ export function isStoredPlanner(value:any):value is PlannerStored {
 export function containsPlannerWork(snapshot:PlannerStored|null):boolean {
  if(!snapshot)return false;
  const d=snapshot.data;
- return !!(d.tasks.length||d.edges.length||d.questions.length||d.tags?.length||d.notes?.trim()||snapshot.archives?.length);
+ return !!(d.tasks.length||d.edges.length||d.questions.length||d.tags?.length||d.timeBlocks?.length||d.notes?.trim()||snapshot.archives?.length);
 }
 
 // The local revision and generated HTML change during page initialization even

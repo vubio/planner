@@ -30,6 +30,12 @@ test('fingerprint ignores revision/derived HTML but includes all task and archiv
  assert.notEqual(a,await contentFingerprint({...stored,archives:[{...stored.archives[0],label:'Updated'}]}));
  assert.match(comparableContent(stored),/GPX4/);
 });
+test('GitHub treats a reserved-time-only planner as meaningful work',()=>{
+ const onlyBand={version:1,data:{tasks:[],edges:[],questions:[],notes:'',timeBlocks:[{id:'b1',title:'Lab meeting',start:'2026-10-23T13:00',end:'2026-10-23T14:00',color:'#687c91',notes:''}]}};
+ assert.equal(isStoredPlanner(onlyBand),true);
+ assert.equal(containsPlannerWork(onlyBand),true);
+ assert.equal(containsPlannerWork({version:1,data:{tasks:[],edges:[],questions:[],notes:''}}),false);
+});
 
 test('local browser data remains readable and invalid data is rejected',()=>{
  const old=globalThis.localStorage;
