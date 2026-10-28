@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds,boundedGroupDragY,verticalEdgeScrollSpeed} from '../src/model.ts';
+import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds,boundedGroupDragY,verticalEdgeScrollSpeed,splitConnection} from '../src/model.ts';
 const task={id:'a',title:'<script>alert(1)</script>',start:'2026-10-19T14:45',duration:15,prep:150,y:40,height:66,color:'#628875',project:'Test',priority:'High',status:'Planned',notes:'A & B',checklist:[{text:'<unsafe>',done:false}],floating:false};
 const data={tasks:[task],edges:[],questions:[],notes:'notes'};
 test('task groups persist in a valid saved planner without breaking older tasks',()=>{
@@ -15,6 +15,18 @@ test('dragging one grouped task moves every member, preserving other task groups
  assert.deepEqual(groupMovementIds(tasks,['a']),['a','b']);
  assert.deepEqual(groupMovementIds(tasks,['a','c']),['a','b','c','d']);
  assert.deepEqual(groupMovementIds(tasks,['e']),['e']);
+});
+test('inserting a task onto an arrow replaces A to B with A to C and C to B',()=>{
+ const edges=[{id:'first',from:'A',to:'B',dashed:true},{id:'unrelated',from:'A',to:'D',dashed:false}];
+ const result=splitConnection(edges,'first','C','new-first','new-second');
+ assert.deepEqual(result,[
+  {id:'new-first',from:'A',to:'C',dashed:true},
+  {id:'new-second',from:'C',to:'B',dashed:true},
+  edges[1],
+ ]);
+ assert.equal(edges.length,2,'original planner graph must remain untouched for undo');
+ assert.deepEqual(splitConnection([{id:'x',from:'A',to:'B',dashed:false}],'x','C','a','b').map(e=>e.dashed),[false,false]);
+ assert.throws(()=>splitConnection(edges,'missing','C','a','b'),/no longer exists/);
 });
 test('dragging a lower selected task cannot hide an upper selected task behind the ruler',()=>{
  const tasks=[{id:'seeded',y:210},{id:'viability',y:32},{id:'unselected',y:5}];

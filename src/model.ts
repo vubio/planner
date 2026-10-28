@@ -1,6 +1,16 @@
 export const dateKey=(d:Date)=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 // One-click outcome cycle: planned/in-progress/stopped → done → failed → planned.
 export const nextTaskStatus=(status:string)=>status==='Done'?'Failed':status==='Failed'?'Planned':'Done';
+/** Replace one directed link A→B with A→C and C→B, leaving other links intact. */
+export function splitConnection<T extends {id:string,from:string,to:string,dashed:boolean}>(edges:readonly T[],edgeId:string,insertedId:string,firstId:string,secondId:string):T[]{
+ const original=edges.find(edge=>edge.id===edgeId);
+ if(!original)throw new Error('Connection no longer exists');
+ if(!insertedId||insertedId===original.from||insertedId===original.to||firstId===secondId)throw new Error('Invalid inserted task or connection IDs');
+ return edges.flatMap(edge=>edge.id===edgeId?[
+  {...edge,id:firstId,to:insertedId},
+  {...edge,id:secondId,from:insertedId},
+ ]:[edge]);
+}
 export function groupMovementIds(tasks:{id:string,groupId?:string}[],selected:string[]):string[]{
  const selectedSet=new Set(selected);
  const groupIds=new Set(tasks.filter(t=>selectedSet.has(t.id)&&t.groupId).map(t=>t.groupId));
