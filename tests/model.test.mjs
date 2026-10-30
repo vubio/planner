@@ -87,6 +87,15 @@ test('canvas Ask & discuss notes persist with optional anchor, color, and vertic
  assert.match(html,/ASK \/ DISCUSS/);
  assert.match(html,/Ask B about reagent C/);
 });
+test('notes without canvas positions validate and stay off the archived timeline',()=>{
+ const note={id:'unpinned-1',text:'Order antibodies',done:false,pinned:false,color:'#ffefb1'};
+ const saved={...data,questions:[note]};
+ assert.equal(validData(saved),true);
+ assert.equal(validData({...data,questions:[{...note,pinned:'no'}]}),false);
+ const html=recordHTML(saved,new Date('2026-10-19T00:00'));
+ assert.match(html,/Order antibodies/);
+ assert.doesNotMatch(html,/ASK \/ DISCUSS<\/text>/);
+});
 test('reserved time blocks validate and persist in complete snapshots without breaking old databases',()=>{
  const band={id:'reserved-1',title:'Lab meeting',start:'2026-10-19T13:00',end:'2026-10-19T14:00',color:'#687c91',notes:'Only passive incubation can run'};
  const withBand={...data,timeBlocks:[band]};

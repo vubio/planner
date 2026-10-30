@@ -32,3 +32,11 @@ test('unfinished-only works with both sorts and an empty result',()=>{
  assert.deepEqual(ids(visiblePinnedNotes(notes,true,'time',palette)),['early-blue','early-purple','late-blue']);
  assert.deepEqual(visiblePinnedNotes([notes[1]],true,'color',palette),[]);
 });
+test('unpinned notes remain in all bottom-panel views and sort after positioned notes by time',()=>{
+ const unpinned={id:'no-position',color:palette[0],done:false,pinned:false};
+ const all=[unpinned,...notes];
+ assert.deepEqual(ids(visiblePinnedNotes(all,false,'original',palette)),ids(all));
+ assert.equal(visiblePinnedNotes(all,true,'original',palette).includes(unpinned),true);
+ assert.equal(visiblePinnedNotes(all,false,'time',palette).at(-1)?.id,'no-position');
+ assert.equal(visiblePinnedNotes(all,false,'color',palette).some(note=>note.id==='no-position'),true);
+});

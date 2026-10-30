@@ -1,12 +1,13 @@
 export type NoteOrder = 'original' | 'time' | 'color';
 
-export type InboxNote = {id:string;done:boolean;at?:string;color?:string};
+export type InboxNote = {id:string;done:boolean;at?:string;color?:string;pinned?:boolean};
 
 /** Keep the stored note order unchanged; sorting is a view-only operation. */
 export function visiblePinnedNotes<T extends InboxNote>(notes:readonly T[],pendingOnly:boolean,order:NoteOrder,palette:readonly string[]):T[]{
  const visible=notes.filter(note=>!pendingOnly||!note.done);
  if(order==='original')return visible;
  const pinnedTime=(note:T)=>{
+  if(note.pinned===false)return Number.POSITIVE_INFINITY;
   const value=note.at?new Date(note.at).getTime():NaN;
   return Number.isFinite(value)?value:Number.POSITIVE_INFINITY;
  };

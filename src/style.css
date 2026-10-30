@@ -203,6 +203,13 @@ main>header h1{margin:4px 0}
 .note-inbox-item .note-inbox-title{display:flex;gap:6px;min-width:0;max-width:245px;text-align:left;color:#534b3a}
 .note-inbox-item .note-inbox-title span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .note-inbox-time{font-size:9px;color:#696c5c;white-space:nowrap}
+.note-inbox form .note-create-button{background:#ecf1eb;border:1px solid #c4d2c4;color:#3d654a;font-weight:750}
+.note-inbox form .note-create-button:hover:not(:disabled){background:#dce8db;border-color:#92ad96}
+.note-inbox form .note-create-button:disabled{opacity:.42;cursor:not-allowed}
+.note-inbox-search{display:flex;align-items:center;gap:5px;padding:2px 7px;border:1px solid #dce5d9;border-radius:6px;background:#fff}
+.note-inbox-search input{width:145px;padding:4px 0;border:0;background:transparent;font-size:11px;outline:none}
+.note-inbox-search:focus-within{outline:2px solid #72967a;outline-offset:1px}
+.note-inbox-item .note-unpinned{font-size:9px;font-weight:600;color:#7c817d;white-space:nowrap}
 .note-modal .modal-heading h2{display:flex;align-items:center;gap:9px}
 .note-modal textarea{display:block;width:100%;font-size:15px;line-height:1.65;background:#fffbeb;border-color:#e5d5a6}
 .note-modal-hint{color:#7a806f;font-size:12px;margin:0 0 15px}
