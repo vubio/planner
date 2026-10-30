@@ -1,0 +1,21 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {wheelZoom,anchoredScrollLeft} from '../src/canvasZoom.ts';
+
+test('Ctrl-wheel changes only the timeline zoom within existing min/max bounds',()=>{
+ assert.ok(wheelZoom(1,-100)>1,'wheel up zooms in');
+ assert.ok(wheelZoom(1,100)<1,'wheel down zooms out');
+ assert.equal(wheelZoom(4,-100),4);
+ assert.equal(wheelZoom(.15,100),.15);
+ assert.equal(wheelZoom(1,0),1);
+ assert.ok(wheelZoom(1,-3,1)>1,'line-mode mouse wheels work too');
+});
+
+test('the canvas point under the cursor remains fixed when zooming',()=>{
+ const oldLeft=2300,cursorX=220,zoomBefore=1,zoomAfter=1.5;
+ const contentX=oldLeft+cursorX;
+ const newLeft=anchoredScrollLeft(contentX,cursorX,zoomBefore,zoomAfter);
+ assert.equal(newLeft,3560);
+ assert.equal(contentX*zoomAfter/zoomBefore-newLeft,cursorX);
+ assert.equal(anchoredScrollLeft(5,100,1,.5),0,'scroll is bounded at the left edge');
+});
