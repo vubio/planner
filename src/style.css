@@ -371,3 +371,35 @@ main>header h1{margin:4px 0}
 .time-block-hint{font-size:12px;color:#61766c;line-height:1.6;margin:-4px 0 20px}
 .time-block-error{color:#a13e37;font-size:12px;font-weight:750;margin:12px 0}
 .time-block-modal .modal-footer button:disabled{opacity:.45;cursor:not-allowed}
+
+
+/* Fixed-height planner workspace: top tools and bottom notes remain visible
+   while the timeline and the note list scroll independently. */
+.app:not(.focus-mode){height:100vh;height:100dvh;min-height:0;overflow:hidden}
+.app:not(.focus-mode) .sidebar{position:relative;top:auto;height:100%;min-height:0;overflow-y:auto}
+.app:not(.focus-mode) main{display:flex;flex-direction:column;height:100%;min-height:0;overflow:hidden;padding-top:9px;padding-bottom:8px}
+.app:not(.focus-mode) main>header{flex:none;justify-content:flex-end;margin:0 0 4px;min-height:0}
+.app:not(.focus-mode) main>header>div{display:none}
+.app:not(.focus-mode) main>header>.primary{min-height:32px;padding:6px 12px}
+.app:not(.focus-mode) .toolbar,.app:not(.focus-mode) .canvas-tools{flex:none}
+.app:not(.focus-mode) .toolbar{padding:5px 0}
+.app:not(.focus-mode) .canvas-tools{padding:6px 0;gap:8px 10px}
+.app:not(.focus-mode) .timeline{flex:1 1 auto;height:auto;min-height:0;margin-bottom:8px;overscroll-behavior:contain}
+.app:not(.focus-mode) .timeline-footer{display:none}
+.app:not(.focus-mode) .bottom-panel{display:flex;flex-direction:column;flex:0 0 auto;min-height:0;max-height:clamp(145px,29dvh,255px);overflow:hidden}
+.app:not(.focus-mode) .panel-tabs{flex:0 0 auto}
+.app:not(.focus-mode) .panel-tabs>span{display:none}
+.app:not(.focus-mode) .questions{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+.app:not(.focus-mode) .scratchpad{flex:1 1 auto;min-height:90px;resize:none;overflow-y:auto}
+.app:not(.focus-mode) main>footer{display:none}
+.app:not(.focus-mode) .quiet-card{padding:4px 8px;margin-bottom:8px}
+.app:not(.focus-mode) .quiet-card>span,.app:not(.focus-mode) .quiet-card>p{display:none}
+.app:not(.focus-mode) .quiet-card button{padding:6px 3px}
+@media (max-height:700px){
+  .app:not(.focus-mode) .bottom-panel{max-height:clamp(120px,25dvh,195px)}
+}
+@media (max-width:700px){
+  /* On small screens keep the canvas scrollable even when toolbars wrap. */
+  .app:not(.focus-mode) .bottom-panel{max-height:145px}
+  .app:not(.focus-mode) .timeline{min-height:120px}
+}
