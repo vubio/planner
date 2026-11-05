@@ -182,7 +182,7 @@ main>header h1{margin:4px 0}
 .floating-note::after{content:'';position:absolute;right:8px;bottom:0;width:16px;height:7px;background:#0000000b;clip-path:polygon(100% 0,0 100%,100% 100%)}
 .floating-note.expanded,.floating-note:focus-within{z-index:19;width:260px;height:auto;max-height:340px;min-height:110px;padding:9px 12px;overflow:auto;cursor:grab;box-shadow:0 9px 28px #3d382d4d;border-color:#ac924e}
 .floating-note:active{cursor:grabbing}
-.floating-note.note-done{opacity:.66}
+.floating-note.note-done{opacity:.29;filter:grayscale(1)}
 .floating-note-head{display:flex;align-items:center;gap:3px;min-width:0;height:14px;color:#786c4f}
 .floating-note-head b{display:none;font-size:9px;font-weight:800;letter-spacing:.55px;flex:1;white-space:nowrap}
 .floating-note.expanded .floating-note-head b,.floating-note:focus-within .floating-note-head b{display:block}
