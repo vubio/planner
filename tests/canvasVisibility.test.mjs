@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {taskVisibleOnCanvas,noteVisibleOnCanvas} from '../src/canvasVisibility.ts';
+import {taskVisibleOnCanvas,noteVisibleOnCanvas,connectionVisuallyDone} from '../src/canvasVisibility.ts';
 
 test('unfinished-only canvas toggle hides done tasks but preserves the separate sidebar filter',()=>{
  const planned={id:'a',status:'Planned'},done={id:'b',status:'Done'},failed={id:'c',status:'Failed'};
@@ -19,4 +19,13 @@ test('unfinished-only canvas toggle also hides handled pinned notes, but not the
  assert.equal(noteVisibleOnCanvas({...note,done:false},true),true);
  assert.equal(noteVisibleOnCanvas({...note,pinned:false},false),false);
  assert.equal(noteVisibleOnCanvas({...note,at:undefined},false),false);
+});
+
+test('a connection fades if either its source or its target is done',()=>{
+ const planned={status:'Planned'},inProgress={status:'In progress'},done={status:'Done'};
+ assert.equal(connectionVisuallyDone(planned,inProgress),false);
+ assert.equal(connectionVisuallyDone(done,planned),true);
+ assert.equal(connectionVisuallyDone(planned,done),true);
+ assert.equal(connectionVisuallyDone(done,done),true);
+ assert.equal(connectionVisuallyDone({status:'Failed'},planned),false);
 });
