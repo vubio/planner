@@ -436,3 +436,42 @@ main>header h1{margin:4px 0}
  .planner-actions{flex-wrap:wrap;justify-content:flex-end}
  .planner-actions button{font-size:10px;min-height:28px}
 }
+
+
+/* Sidebar utilities replace the floating GitHub badge and free toolbar width. */
+.app{--planner-sidebar-width:232px}
+.app:not(.focus-mode) .sidebar{padding-top:17px}
+.app:not(.focus-mode) .brand{margin-bottom:20px}
+.app:not(.focus-mode) .section-label{margin-top:16px}
+.app:not(.focus-mode) .filters label{padding:5px 0}
+.app:not(.focus-mode) .sidebar-bottom{padding-top:8px;padding-bottom:54px}
+.app:not(.focus-mode) .quiet-card{margin-bottom:6px}
+.app:not(.focus-mode) .sidebar .profile{display:none}
+.sidebar-utilities{display:grid;gap:5px;padding:7px 0;margin-bottom:7px;border-top:1px solid #d5e0d3}
+.sidebar-progress{font-size:11px;font-weight:750;color:#3c5d46}
+.sidebar-local-save{font-size:10px;color:#637e69;overflow-wrap:anywhere;line-height:1.3}
+.sidebar-local-save.sidebar-save-error{color:#a13d30;font-weight:750}
+.sidebar-utilities button{width:100%;min-height:30px;padding:6px 8px;font-size:11px;font-weight:700;justify-content:flex-start;border:1px solid #c8d9c6;background:#f6faf4}
+.sidebar-utilities .sidebar-save{background:#e4efe2;color:#2f5e42;border-color:#b7d0b6}
+.sidebar-utilities .sidebar-snapshot{background:#f9fbf7;color:#4b6752}
+.app:not(.focus-mode) .github-sync-widget{left:12px;right:auto;bottom:12px;width:calc(var(--planner-sidebar-width) - 24px);max-width:208px;z-index:36}
+.app:not(.focus-mode) .github-sync-indicator{width:100%;max-width:100%;padding:7px 9px;min-height:36px;border-radius:8px;font-size:10px;box-shadow:0 2px 9px #153a251a}
+.app:not(.focus-mode) .planner-actions .save-now,
+.app:not(.focus-mode) .canvas-tools .canvas-snapshot,
+.app:not(.focus-mode) .canvas-tools .save-indicator,
+.app:not(.focus-mode) .canvas-tools>span{display:none}
+.app:not(.focus-mode) .bottom-panel{max-height:clamp(118px,16dvh,145px)}
+@media(max-width:1100px){
+ .app{--planner-sidebar-width:190px}
+ .app:not(.focus-mode) .sidebar{padding-left:10px;padding-right:10px}
+}
+@media(max-width:700px){
+ .app{--planner-sidebar-width:58px}
+ .app:not(.focus-mode) .github-sync-widget{left:12px;bottom:12px;width:34px}
+ .app:not(.focus-mode) .github-sync-indicator{width:34px;min-height:34px;height:34px;border-radius:50%;padding:0;justify-content:center}
+ .app:not(.focus-mode) .github-sync-indicator span{display:none}
+ .app:not(.focus-mode) .canvas-tools .save-now,
+ .app:not(.focus-mode) .canvas-tools .canvas-snapshot,
+ .app:not(.focus-mode) .canvas-tools .save-indicator,
+ .app:not(.focus-mode) .canvas-tools>span{display:inline-flex}
+}
