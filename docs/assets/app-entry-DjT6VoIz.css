@@ -103,3 +103,29 @@
  .app:not(.focus-mode) .canvas-tools .save-indicator,
  .app:not(.focus-mode) .canvas-tools>span{display:inline-flex}
 }
+
+
+/* Dock Google Drive above GitHub in the sidebar instead of over the notes. */
+:root{--planner-sidebar-width:232px}
+.app:not(.focus-mode) .sidebar-bottom{padding-bottom:102px}
+.drive-sync-launcher{
+ position:fixed;left:12px;right:auto;bottom:56px;z-index:29;
+ width:calc(var(--planner-sidebar-width) - 24px);max-width:208px;min-height:35px;
+ display:inline-flex;align-items:center;justify-content:center;gap:5px;
+ padding:7px 9px;border:1px solid #355b47;border-radius:8px;
+ background:#355b47;color:#fff;font-size:11px;font-weight:750;
+ box-shadow:0 2px 9px #153a251a;white-space:nowrap
+}
+.drive-sync-launcher:hover{background:#284c37;color:#fff}
+#root>.overlay{z-index:60}
+@media(max-width:1100px){:root{--planner-sidebar-width:190px}}
+@media(max-width:700px){
+ :root{--planner-sidebar-width:58px}
+ .drive-sync-launcher{left:12px;bottom:55px;width:34px;height:34px;min-height:34px;padding:0;border-radius:50%;font-size:0}
+ .drive-sync-launcher::before{content:"☁";font-size:17px}
+}
+body:has(.app.focus-mode) .drive-sync-launcher{
+ left:auto;right:16px;bottom:64px;width:auto;max-width:none;
+ min-height:34px;padding:8px 13px;border-radius:999px;font-size:11px
+}
+body:has(.app.focus-mode) .drive-sync-launcher::before{content:none}
