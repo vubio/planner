@@ -16,3 +16,10 @@ export function parseQuickNotes(value:unknown):QuickNote[]{
 export function quickNoteDisplayTitle(note:Pick<QuickNote,'title'|'details'>):string{
  return note.title.trim()||note.details.trim().split(/\r?\n/,1)[0]||'Untitled note';
 }
+
+/** Bring earlier browser-only notes into the synced planner once, preserving
+ * any note already present in the main database (including edits). */
+export function mergeQuickNotes(current:QuickNote[],legacy:QuickNote[]):QuickNote[]{
+ const seen=new Set(current.map(note=>note.id));
+ return [...current,...legacy.filter(note=>{if(seen.has(note.id))return false;seen.add(note.id);return true})];
+}

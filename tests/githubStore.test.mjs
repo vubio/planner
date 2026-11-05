@@ -30,6 +30,18 @@ test('fingerprint ignores revision/derived HTML but includes all task and archiv
  assert.notEqual(a,await contentFingerprint({...stored,archives:[{...stored.archives[0],label:'Updated'}]}));
  assert.match(comparableContent(stored),/GPX4/);
 });
+test('quick notes are synced while an empty new list remains equivalent to older GitHub records',async()=>{
+ const note={id:'reference-1',title:'Reagent catalog',details:'XYZ-123'};
+ const withEmptyNotes={...stored,data:{...stored.data,quickNotes:[]}};
+ assert.equal(await contentFingerprint(stored),await contentFingerprint(withEmptyNotes));
+ const withNotes={...stored,data:{...stored.data,quickNotes:[note]}};
+ assert.equal(isStoredPlanner(withNotes),true);
+ assert.notEqual(await contentFingerprint(stored),await contentFingerprint(withNotes));
+ assert.match(comparableContent(withNotes),/Reagent catalog/);
+ const onlyNotes={version:1,data:{tasks:[],edges:[],questions:[],notes:'',quickNotes:[note]}};
+ assert.equal(containsPlannerWork(onlyNotes),true);
+ assert.equal(isStoredPlanner(onlyNotes),true);
+});
 test('GitHub treats a reserved-time-only planner as meaningful work',()=>{
  const onlyBand={version:1,data:{tasks:[],edges:[],questions:[],notes:'',timeBlocks:[{id:'b1',title:'Lab meeting',start:'2026-10-23T13:00',end:'2026-10-23T14:00',color:'#687c91',notes:''}]}};
  assert.equal(isStoredPlanner(onlyBand),true);

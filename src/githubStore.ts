@@ -30,14 +30,17 @@ export function isStoredPlanner(value:any):value is PlannerStored {
 export function containsPlannerWork(snapshot:PlannerStored|null):boolean {
  if(!snapshot)return false;
  const d=snapshot.data;
- return !!(d.tasks.length||d.edges.length||d.questions.length||d.tags?.length||d.timeBlocks?.length||d.notes?.trim()||snapshot.archives?.length);
+ return !!(d.tasks.length||d.edges.length||d.questions.length||d.tags?.length||d.timeBlocks?.length||d.quickNotes?.length||d.notes?.trim()||snapshot.archives?.length);
 }
 
 // The local revision and generated HTML change during page initialization even
 // when a person has not edited a task. Only compare actual user records.
 export function comparableContent(snapshot:PlannerStored|null):string {
  if(!snapshot)return JSON.stringify({data:{tasks:[],edges:[],questions:[],notes:'',tags:[]},archives:[]});
- return JSON.stringify({data:snapshot.data,archives:snapshot.archives||[]});
+ // Older GitHub copies predate Quick notes. An empty list is equivalent to
+ // its absence, avoiding a false two-version conflict on first upgrade.
+ const data=snapshot.data.quickNotes?.length?snapshot.data:Object.fromEntries(Object.entries(snapshot.data).filter(([field])=>field!=='quickNotes'));
+ return JSON.stringify({data,archives:snapshot.archives||[]});
 }
 
 export async function contentFingerprint(snapshot:PlannerStored|null):Promise<string> {

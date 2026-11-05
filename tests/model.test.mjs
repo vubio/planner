@@ -96,6 +96,18 @@ test('notes without canvas positions validate and stay off the archived timeline
  assert.match(html,/Order antibodies/);
  assert.doesNotMatch(html,/ASK \/ DISCUSS<\/text>/);
 });
+test('independent quick notes validate, survive snapshots, and reject duplicate IDs',()=>{
+ const note={id:'reference-1',title:'Shipping address',details:'123 Lab Street'};
+ const withNotes={...data,quickNotes:[note]};
+ assert.equal(validData(data),true,'old planner backups without Quick notes remain valid');
+ assert.equal(validData(withNotes),true);
+ assert.equal(validData({...withNotes,quickNotes:[note,note]}),false);
+ assert.equal(validData({...withNotes,quickNotes:[{...note,details:null}]}),false);
+ const html=recordHTML(withNotes,new Date('2026-10-19T00:00'));
+ assert.match(html,/Quick notes/);
+ assert.match(html,/Shipping address/);
+ assert.match(html,/123 Lab Street/);
+});
 test('reserved time blocks validate and persist in complete snapshots without breaking old databases',()=>{
  const band={id:'reserved-1',title:'Lab meeting',start:'2026-10-19T13:00',end:'2026-10-19T14:00',color:'#687c91',notes:'Only passive incubation can run'};
  const withBand={...data,timeBlocks:[band]};
