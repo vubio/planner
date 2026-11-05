@@ -553,3 +553,37 @@ body:has(.app.focus-mode) .drive-sync-launcher::before{content:none}
  .daily-schedule-hint{padding:6px 10px;font-size:9px}
  .daily-event-title{font-size:11px}
 }
+
+/* Browser-local reference notes occupy the spare sidebar height; each entry
+   stays one line, with an independent scrollbar for long lists. */
+.sidebar-quick-notes{display:flex;flex-direction:column;flex:1 1 auto;min-height:92px;min-width:0;overflow:hidden;margin-top:13px;padding-top:9px;border-top:1px solid #d8e3d5}
+.quick-notes-heading{display:flex;justify-content:space-between;align-items:center;gap:5px;flex:none;padding:0 1px 5px}
+.quick-notes-heading h3{display:flex;align-items:center;gap:6px;margin:0;color:#54765c;font-size:10px;letter-spacing:.9px;font-weight:800}
+.quick-notes-heading h3 small{font-size:10px;letter-spacing:0;color:#899a88}
+.quick-note-add{width:25px;height:25px;min-width:25px;padding:0;color:#356047;border:1px solid #c7d9c4;background:#f7faf4}
+.quick-note-add:hover{background:#dceadd}
+.quick-notes-list{display:flex;flex-direction:column;min-height:0;flex:1 1 auto;overflow-y:auto;scrollbar-width:thin;scrollbar-color:#bbcbb9 transparent;gap:2px;overscroll-behavior:contain}
+.quick-note-row{display:flex;justify-content:flex-start;gap:7px;flex:none;width:100%;min-height:30px;padding:6px 7px;border-radius:5px;text-align:left;background:#f8faf6;color:#3f5947;font-size:11px}
+.quick-note-row:hover{background:#e0ebde}
+.quick-note-row svg{flex-shrink:0;color:#7c977d}
+.quick-note-row span{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.quick-notes-empty{padding:11px 4px;color:#9aa99a;font-size:10px;line-height:1.5}
+.quick-notes-error{padding:7px;color:#a2473b;font-size:11px;line-height:1.5}
+.quick-notes-local{flex:none;padding:6px 2px 2px;color:#98a69a;font-size:9px;line-height:1.4}
+.quick-note-overlay{z-index:90}
+.quick-note-modal{width:min(570px,100%)}
+.quick-note-modal .detail-label input{width:100%;font-size:13px}
+.quick-note-detail-label{margin-top:15px}
+.quick-note-detail-label textarea{min-height:130px;max-height:45dvh;resize:vertical;font-size:13px}
+.quick-note-privacy{font-size:11px;line-height:1.5;color:#879588;margin:11px 0 0}
+.quick-note-modal .modal-footer{align-items:center}
+.quick-note-modal .modal-footer .primary:disabled{opacity:.45;cursor:not-allowed}
+.quick-notes-mobile{display:none}
+.quick-notes-mobile-modal{width:min(500px,100%)}
+.quick-notes-mobile-modal .quick-notes-list{max-height:60dvh;min-height:120px;flex:0 1 auto}
+.quick-notes-mobile-modal .modal-footer{align-items:center}
+.quick-notes-mobile-modal .modal-footer small{color:#8da08e;font-size:11px}
+@media(max-width:700px){
+ .sidebar-quick-notes{display:none}
+ .quick-notes-mobile{display:inline-flex;flex:none;margin-top:16px;padding:7px 9px;color:#426a50;background:#e4eee0}
+}
