@@ -501,3 +501,55 @@ body:has(.app.focus-mode) .drive-sync-launcher{
  min-height:34px;padding:8px 13px;border-radius:999px;font-size:11px
 }
 body:has(.app.focus-mode) .drive-sync-launcher::before{content:none}
+
+/* Calendar-style daily schedule, separate from the free-form planning canvas. */
+.sidebar .daily-nav{background:#e7efe3;color:#315a41;font-weight:750;border:1px solid #d2dfcb}
+.sidebar .daily-nav:hover{background:#dcead9}
+.daily-overlay{z-index:85;padding:18px;background:#132b214f}
+.daily-schedule{width:min(970px,100%);height:min(850px,93dvh);display:flex;flex-direction:column;min-height:0;overflow:hidden;background:#fff;border:1px solid #c9d8ca;border-radius:15px;box-shadow:0 24px 80px #11281c50}
+.daily-schedule-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:none;margin:0;padding:16px 19px 12px;background:#f8faf6;border-bottom:1px solid #e3e9df}
+.daily-schedule-heading{min-width:0}
+.daily-schedule-heading>span{display:flex;align-items:center;gap:6px;color:#5e8068;font-size:10px;letter-spacing:1.2px;font-weight:800}
+.daily-schedule-heading h2{margin:3px 0 2px;font:700 21px Manrope,system-ui,sans-serif;letter-spacing:-.55px;color:#2b4737;white-space:normal}
+.daily-schedule-heading small{color:#6c826f;font-size:11px}
+.daily-schedule-actions{display:flex;align-items:center;flex:none;gap:5px}
+.daily-schedule-actions button{height:33px;min-width:34px;padding:5px 8px;border:1px solid #d6e1d4;background:white;color:#385c47;font-weight:750}
+.daily-schedule-actions button:hover{background:#e8f2e7}
+.daily-schedule-actions .daily-today{background:#eaf3e7;padding:6px 11px}
+.daily-schedule-actions .daily-close{margin-left:6px;background:#f8f1ee;color:#7b5148;border-color:#eadcd5}
+.daily-schedule-hint{padding:7px 18px;flex:none;font-size:10px;color:#718573;border-bottom:1px solid #e3e9df;background:#fff}
+.daily-schedule-scroll{flex:1 1 auto;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-color:#bfd0bf #f7f9f5;scrollbar-width:thin}
+.daily-schedule-grid{position:relative;width:100%;background:linear-gradient(to right,#f3f7f0 0,#f3f7f0 78px,#fff 78px,#fff 100%);isolation:isolate}
+.daily-hour-line{position:absolute;left:0;right:0;border-top:1px solid #dce5db;height:0;pointer-events:none;z-index:0}
+.daily-hour-line>span{position:absolute;top:-9px;left:11px;padding:0 4px;background:#f3f7f0;color:#637b66;font-size:11px;font-weight:750;white-space:nowrap}
+.daily-half-line{position:absolute;left:78px;right:0;height:0;border-top:1px dashed #ebefe8;pointer-events:none;z-index:0}
+.daily-schedule-grid:before{content:"";position:absolute;left:77px;top:0;bottom:0;border-left:1px solid #cbdacb;z-index:1}
+.daily-schedule-event{position:absolute;z-index:3;min-width:20px;overflow:hidden;padding:11px 9px 8px;border:1px solid;border-left-width:5px;border-radius:6px;box-shadow:0 2px 8px #22392820;cursor:pointer;user-select:none;touch-action:none;color:#244133}
+.daily-schedule-event:hover{z-index:6;box-shadow:0 4px 13px #2239283d;filter:saturate(1.13)}
+.daily-schedule-event.daily-done{opacity:.48;filter:grayscale(.75)}
+.daily-schedule-event.daily-reserved{border-style:dashed;background-image:repeating-linear-gradient(135deg,#ffffff25 0,#ffffff25 8px,#ffffff00 8px,#ffffff00 16px)}
+.daily-event-title{font-size:12px;line-height:1.2;font-weight:800;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow-wrap:anywhere}
+.daily-event-time{font-size:10px;font-weight:750;margin-top:5px;white-space:normal}
+.daily-schedule-event small{display:block;margin-top:5px;color:#526b59;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.daily-schedule-event.daily-short{padding:3px 7px}
+.daily-short .daily-event-title{font-size:10px;white-space:nowrap;display:block;text-overflow:ellipsis;line-height:1.2}
+.daily-resize-handle{position:absolute;left:0;right:0;width:100%;height:9px;border-radius:0;padding:0;margin:0;background:transparent;color:inherit;z-index:7;cursor:ns-resize;touch-action:none}
+.daily-resize-handle:hover,.daily-resize-handle:focus-visible{background:#ffffffb0;border-color:currentColor}
+.daily-resize-start{top:0;border-top:2px solid #31553b50}
+.daily-resize-end{bottom:0;border-bottom:2px solid #31553b50}
+.daily-now-line{position:absolute;left:78px;right:0;border-top:2px solid #c95d47;z-index:7;pointer-events:none}
+.daily-now-line:after{content:"";position:absolute;left:-5px;top:-5px;width:8px;height:8px;background:#c95d47;border-radius:50%}
+.daily-now-line>span{position:absolute;right:7px;top:-20px;color:#fff;background:#c95d47;border-radius:4px;padding:2px 5px;font-size:10px;font-weight:800;white-space:nowrap}
+.daily-empty{position:absolute;top:38%;left:calc(50% + 39px);transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:#7d907d;white-space:nowrap;pointer-events:none}
+.daily-empty strong{font-size:15px;color:#526b55}
+.daily-empty span{font-size:11px}
+@media(max-width:700px){
+ .daily-overlay{padding:7px}
+ .daily-schedule{height:96dvh;border-radius:9px}
+ .daily-schedule-header{align-items:flex-start;flex-wrap:wrap;padding:10px 11px}
+ .daily-schedule-heading h2{font-size:17px}
+ .daily-schedule-actions{margin-left:auto}
+ .daily-schedule-actions button{height:30px}
+ .daily-schedule-hint{padding:6px 10px;font-size:9px}
+ .daily-event-title{font-size:11px}
+}
