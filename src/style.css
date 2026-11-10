@@ -22,7 +22,7 @@ header p{font-size:14px;color:#5f7463}
 .ticks span{font-size:11px;color:#41594a;font-weight:700;margin-left:6px}
 .day-grid{border-right-color:#d7e1d4}
 .task{border-width:2px;border-left-width:6px;border-radius:7px;box-shadow:0 2px 8px #243e2d36}
-.task-content{padding:8px 10px}
+.task-content{padding:5px 8px}
 .task strong{font-size:14px;font-weight:800;line-height:1.25;color:#1c3328;text-shadow:0 1px #ffffff70}
 .task-meta{font-size:10px;font-weight:750;color:#2a4735;opacity:1;letter-spacing:.5px}
 .task small{font-size:11px;font-weight:700;color:#294b3b;margin-top:5px}
@@ -276,9 +276,9 @@ main>header h1{margin:4px 0}
 /* Task titles occupy collision-tested floating cards when blocks are narrow or overlap.
    The main blocks remain fully interactive; labels have their own drag targets. */
 /* Keep compact labels as plain nearby text rather than separate-looking task cards. */
-.task.compact .task-content{position:absolute;bottom:auto;top:-58px;left:0;min-width:120px;max-width:194px;width:max-content;height:auto;padding:2px 4px;background:transparent;border:0;border-radius:0;box-shadow:none;cursor:default;pointer-events:auto;overflow:visible}
+.task.compact .task-content{position:absolute;bottom:auto;top:-39px;left:0;min-width:120px;max-width:194px;width:max-content;height:auto;padding:1px 3px;background:transparent;border:0;border-radius:0;box-shadow:none;cursor:default;pointer-events:auto;overflow:visible}
 .task.compact .task-content:hover{background:transparent;box-shadow:none}
-.task.compact .task-content strong{font-size:13px;line-height:1.27;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;text-overflow:ellipsis;max-width:185px;text-shadow:0 1px 2px #fff,0 -1px 2px #fff}
+.task.compact .task-content strong{font-size:13px;line-height:1.18;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;text-overflow:ellipsis;max-width:185px;text-shadow:0 1px 2px #fff,0 -1px 2px #fff}
 .task.compact .task-content small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:185px;margin-top:3px;text-shadow:0 1px 2px #fff}
 .task.compact .task-tags{bottom:auto;top:calc(100% + 4px);left:0;right:auto;z-index:8}
 .task-title-click{cursor:text;border-radius:3px}
@@ -301,19 +301,19 @@ main>header h1{margin:4px 0}
 .context-menu-separator{height:1px;background:#e7ebe3;margin:6px 4px}
 
 /* Optional project names become distinctive, consistent-color chips. */
-.task .task-meta{display:flex;align-items:center;margin-bottom:8px;min-width:0}
+.task .task-meta{display:flex;align-items:center;margin-bottom:4px;min-width:0}
 .project-chip{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:4px 9px;border-radius:5px;font-size:11px;font-weight:850;line-height:1.25;letter-spacing:.3px;text-transform:none;color:#fff;box-shadow:0 1px 4px #142f2b30}
 .task.compact.has-project .task-meta{display:flex;margin:0 0 3px}
-.task.compact.has-project .task-content{transform:translateY(-18px)}
+.task.compact.has-project .task-content{transform:none}
 .task.compact .project-chip{font-size:10px;padding:2px 6px;box-shadow:none}
 
 /* Actionable checklist indicator on the canvas. */
-.task-time-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:5px;min-width:0}
+.task-time-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:2px;min-width:0}
 .task .task-time-row .task-time-text{display:inline;max-width:100%;font-size:11px;line-height:1.4;font-weight:750;margin:0;white-space:nowrap}
 .task-checklist-trigger{display:inline-flex;align-items:center;gap:4px;flex-shrink:0;padding:4px 8px;border:1px solid #d6a958;border-radius:6px;background:#fff0bc;color:#6e4d0f;font-size:12px;font-weight:900;line-height:1.15;box-shadow:0 1px 4px #926a2035;cursor:pointer;touch-action:manipulation;white-space:nowrap}
 .task-checklist-trigger:hover,.task-checklist-trigger:focus-visible{background:#ffdf8a;border-color:#ad7e2e;box-shadow:0 1px 7px #90611f65}
 .task-checklist-trigger.checklist-complete{background:#dceede;border-color:#9bc8a1;color:#28603c;box-shadow:none}
-.task.compact .task-time-row{gap:4px;flex-wrap:wrap}
+.task.compact .task-time-row{gap:4px;flex-wrap:wrap;margin-top:1px}
 .task.compact .task-time-row .task-time-text{font-size:10px;white-space:normal;overflow-wrap:anywhere}
 .task.compact .task-checklist-trigger{font-size:10px;padding:2px 5px;gap:3px}
 .task.compact .task-checklist-trigger svg{width:12px;height:12px}
@@ -345,16 +345,16 @@ main>header h1{margin:4px 0}
 /* Tall, narrow tasks have usable vertical space: keep their name inside the block.
    Only the time-range label moves just above it. Truly tiny tasks still use the
    nearby compact external title. */
-.task.vertical .task-content{position:relative;width:100%;height:100%;padding:26px 7px 25px;overflow:hidden}
+.task.vertical .task-content{position:relative;width:100%;height:100%;padding:20px 7px;overflow:hidden}
 .task.vertical .task-content strong{font-size:13px;line-height:1.28;white-space:normal;overflow-wrap:anywhere;word-break:normal;display:block;text-overflow:clip}
-.task.vertical .task-time-row{margin-top:7px;gap:4px}
+.task.vertical .task-time-row{margin-top:2px;gap:4px}
 .task.vertical .task-time-row .task-time-text{display:none}
 .task.vertical .task-notes,.task.vertical .task-checklist{display:none}
 .task.vertical .project-chip{font-size:9px;padding:3px 5px}
 .task.vertical .task-meta{margin-bottom:6px}
 .task.vertical .task-checklist-trigger{font-size:10px;padding:3px 5px}
 .task.vertical .task-checklist-trigger svg{width:12px;height:12px}
-.task.vertical .task-time-outside{position:absolute;left:2px;top:-29px;width:max-content;max-width:238px;padding:1px 2px;color:#314b3c;font-size:11px;font-weight:750;line-height:1.3;white-space:nowrap;pointer-events:none;text-shadow:0 1px 3px #fff,0 -1px 3px #fff}
+.task.vertical .task-time-outside{position:absolute;left:2px;top:-19px;width:max-content;max-width:238px;padding:1px 2px;color:#314b3c;font-size:11px;font-weight:750;line-height:1.3;white-space:nowrap;pointer-events:none;text-shadow:0 1px 3px #fff,0 -1px 3px #fff}
 .task.vertical .task-inline-title-input{min-width:0;width:100%;max-width:100%;padding:3px 2px;font-size:12px}
 
 /* Reserved time is a background layer, never a foreground task.

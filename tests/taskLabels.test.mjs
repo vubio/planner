@@ -48,3 +48,13 @@ test('compact-title positions skip tasks whose title fits vertically inside',()=
  const tiny={...task('tiny',280,280,18,44),title:'Tiny',layout:'compact'};
  assert.deepEqual(placeCompactTitles([inside,tiny]).map(t=>t.id),['tiny']);
 });
+
+test('short titles sit close to their boxes, while longer and project labels reserve enough room',()=>{
+ const basic={...task('short',360,500,76,58),title:'Screening Plan'};
+ const longer={...task('long',700,500,76,58),title:'Cell isolation and sequencing quality control'};
+ const project={...task('project',1050,500,76,58),title:'Screening Plan',hasProject:true};
+ const positions=placeCompactTitles([basic,longer,project]);
+ assert.equal(positions.find(t=>t.id==='short').top,-39,'single-line title should no longer reserve 58px above the box');
+ assert.ok(positions.find(t=>t.id==='long').top<-39,'wrapped title needs more headroom');
+ assert.ok(positions.find(t=>t.id==='project').top<-39,'project chip needs more headroom');
+});
