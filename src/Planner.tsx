@@ -1,5 +1,5 @@
 'use client';
-import {validData,reaches,recordHTML,nextTaskStatus,groupMovementIds,boundedGroupDragY,verticalEdgeScrollSpeed,splitConnection} from './model';
+import {validData,reaches,recordHTML,nextTaskStatus,groupMovementIds,boundedGroupDragY,verticalEdgeScrollSpeed,splitConnection,duplicateTaskSelection} from './model';
 import {useEffect,useLayoutEffect,useRef,useState} from 'react';
 import {Plus,Search,ChevronLeft,ChevronRight,Check,ArrowUpRight,SlidersHorizontal,Archive,Link2,Download,StickyNote,MessageCircle,CalendarDays,Undo2,RotateCcw,X,FlaskConical,Maximize2,Minimize2,PanelTopClose,PanelTopOpen,ListChecks,Tag as TagIcon} from 'lucide-react';
 import GithubSyncPanel from './GithubSyncPanel';
@@ -120,6 +120,17 @@ export default function Planner(){
  const recolorSelection=(color:string,index:number)=>{const ids=selectedIds.filter(id=>dataRef.current.tasks.some(t=>t.id===id));if(!ids.length){setSelectedColor(index);return;}const chosen=new Set(ids);update({...dataRef.current,tasks:dataRef.current.tasks.map(t=>chosen.has(t.id)?{...t,color}:t)});setMessage(`${ids.length} selected task${ids.length===1?'':'s'} recolored`)};
  const groupSelected=(ids:string[])=>{const current=dataRef.current,chosen=new Set(ids),previous=new Set(current.tasks.filter(t=>chosen.has(t.id)&&t.groupId).map(t=>t.groupId));current.tasks.forEach(t=>{if(t.groupId&&previous.has(t.groupId))chosen.add(t.id)});if(chosen.size<2)return;const groupId=uid();update({...current,tasks:current.tasks.map(t=>chosen.has(t.id)?{...t,groupId}:t)});const selectedGroup=[...chosen];setSelectedIds(selectedGroup);setSelected(selectedGroup.at(-1)||null);setMessage(`${chosen.size} tasks grouped · Drag any one to move all`)};
  const ungroupSelected=(ids:string[])=>{const current=dataRef.current,groupIds=new Set(current.tasks.filter(t=>ids.includes(t.id)&&t.groupId).map(t=>t.groupId));if(!groupIds.size)return;update({...current,tasks:current.tasks.map(t=>t.groupId&&groupIds.has(t.groupId)?{...t,groupId:undefined}:t)});setMessage('Tasks ungrouped · They now move independently')};
+
+ const duplicateSelectedTasks=(ids:string[])=>{
+  const current=dataRef.current,duplicates=duplicateTaskSelection(current,ids,uid,local);
+  if(!duplicates.newIds.length)return;
+  update({...current,tasks:duplicates.tasks,edges:duplicates.edges,tags:duplicates.tags});
+  setSelectedIds(duplicates.newIds);
+  setSelected(duplicates.newIds.at(-1)||null);
+  setSelectedEdge(null);
+  setContextMenu(null);
+  setMessage(`${duplicates.newIds.length} task${duplicates.newIds.length===1?'':'s'} duplicated · Copies selected · Undo is available`);
+ };
  const removeSelected=(ids:string[])=>{const current=dataRef.current,deleted=new Set(ids);update({...current,tasks:current.tasks.filter(t=>!deleted.has(t.id)),edges:current.edges.filter(e=>!deleted.has(e.from)&&!deleted.has(e.to)),tags:(current.tags||[]).filter(t=>!deleted.has(t.taskId||''))});clearSelection();setContextMenu(null);setMessage(`${ids.length} task${ids.length===1?'':'s'} deleted · Undo is available`)};
  useEffect(()=>{if(!edit)return;titleInput.current?.focus();if(edit.title==='Untitled task')titleInput.current?.select()},[edit?.id]);
  const readStore=()=>JSON.parse(localStorage.getItem('vubio-planner-v1')||'null');
@@ -462,7 +473,7 @@ export default function Planner(){
    <button role="menuitem" onClick={()=>{setNoteEdit(makeNote('',new Date(contextTask.start),contextTask.y+contextTask.height+30));setContextMenu(null)}}><MessageCircle size={15}/> Pin Ask / discuss note</button>
    <button role="menuitem" onClick={()=>{setLinkFrom(contextTask.id);setContextMenu(null)}}><Link2 size={15}/> Connect from this task</button>
    <button role="menuitem" onClick={()=>{patch(contextTask.id,{status:nextTaskStatus(contextTask.status)});setContextMenu(null)}}><Check size={15}/> {contextTask.status==='Done'?'Mark as failed':contextTask.status==='Failed'?'Reset to planned':'Mark as done'}</button>
-   <button role="menuitem" onClick={()=>{const copy:Task={...contextTask,id:uid(),title:contextTask.title+' (copy)',start:local(new Date(new Date(contextTask.start).getTime()+60*60000)),y:contextTask.y+70,groupId:undefined};update({...dataRef.current,tasks:[...dataRef.current.tasks,copy]});selectTask(copy.id);setContextMenu(null)}}><Plus size={15}/> Duplicate task</button>
+   <button role="menuitem" onClick={()=>duplicateSelectedTasks(contextSelection)}><Plus size={15}/> Duplicate {contextSelection.length>1?`selected tasks (${contextSelection.length})`:'task'}</button>
    <div className="context-menu-separator"/>
    <button className="context-danger" role="menuitem" onClick={()=>{if(confirm(`Delete ${contextSelection.length} selected task${contextSelection.length===1?'':'s'} and their connections?`))removeSelected(contextSelection);setContextMenu(null)}}><X size={15}/> Delete selected {contextSelection.length>1?`(${contextSelection.length})`:''}</button>
   </>:<>

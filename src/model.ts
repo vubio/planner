@@ -16,6 +16,42 @@ export function groupMovementIds(tasks:{id:string,groupId?:string}[],selected:st
  const groupIds=new Set(tasks.filter(t=>selectedSet.has(t.id)&&t.groupId).map(t=>t.groupId));
  return tasks.filter(t=>selectedSet.has(t.id)||(t.groupId&&groupIds.has(t.groupId))).map(t=>t.id);
 }
+
+/** Duplicate the selected tasks as a separate, movable cluster.
+ * Only links with BOTH endpoints selected are copied. Attached labels follow their task.
+ * Existing groups get new group IDs, so original tasks never move with the copies. */
+export function duplicateTaskSelection<
+ T extends {id:string,title:string,start:string,y:number,groupId?:string,checklist:{text:string,done:boolean}[]},
+ E extends {id:string,from:string,to:string},
+ G extends {id:string,taskId?:string}
+>(
+ data:{tasks:readonly T[],edges:readonly E[],tags?:readonly G[]},
+ selectedIds:readonly string[],
+ newId:()=>string,
+ formatDate:(date:Date)=>string
+):{tasks:T[],edges:E[],tags:G[],newIds:string[]}{
+ const wanted=new Set(selectedIds),originals=data.tasks.filter(task=>wanted.has(task.id));
+ const idMap=new Map(originals.map(task=>[task.id,newId()]));
+ const counts=new Map<string,number>(),groups=new Map<string,string>();
+ for(const task of originals)if(task.groupId)counts.set(task.groupId,(counts.get(task.groupId)||0)+1);
+ const copies=originals.map(task=>{
+  let groupId:string|undefined;
+  if(task.groupId&&(counts.get(task.groupId)||0)>1){
+   if(!groups.has(task.groupId))groups.set(task.groupId,newId());
+   groupId=groups.get(task.groupId);
+  }
+  return {...task,id:idMap.get(task.id)!,title:task.title+' (copy)',
+   start:formatDate(new Date(new Date(task.start).getTime()+60*60000)),
+   y:task.y+70,groupId,checklist:task.checklist.map(step=>({...step}))};
+ });
+ const edges=data.edges.filter(edge=>idMap.has(edge.from)&&idMap.has(edge.to))
+  .map(edge=>({...edge,id:newId(),from:idMap.get(edge.from)!,to:idMap.get(edge.to)!}));
+ const tags=(data.tags||[]).filter(tag=>tag.taskId&&idMap.has(tag.taskId))
+  .map(tag=>({...tag,id:newId(),taskId:idMap.get(tag.taskId!)!}));
+ return {tasks:[...data.tasks,...copies],edges:[...data.edges,...edges],
+  tags:[...(data.tags||[]),...tags],newIds:copies.map(task=>task.id)};
+}
+
 /** Limit the shared drag offset using the TOPMOST moving task, not the grabbed one.
  * Already out-of-bounds positions are never made worse or snapped unexpectedly. */
 export function boundedGroupDragY(tasks:readonly {id:string,y:number}[],movingIds:ReadonlySet<string>,requestedDy:number,canvasTopY:number):number{

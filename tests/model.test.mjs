@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds,boundedGroupDragY,verticalEdgeScrollSpeed,splitConnection} from '../src/model.ts';
+import {validData,reaches,recordHTML,dateKey,nextTaskStatus,groupMovementIds,boundedGroupDragY,verticalEdgeScrollSpeed,splitConnection,duplicateTaskSelection} from '../src/model.ts';
 const task={id:'a',title:'<script>alert(1)</script>',start:'2026-10-19T14:45',duration:15,prep:150,y:40,height:66,color:'#628875',project:'Test',priority:'High',status:'Planned',notes:'A & B',checklist:[{text:'<unsafe>',done:false}],floating:false};
 const data={tasks:[task],edges:[],questions:[],notes:'notes'};
 test('task groups persist in a valid saved planner without breaking older tasks',()=>{
@@ -124,3 +124,48 @@ test('reserved time blocks validate and persist in complete snapshots without br
 });
 test('graph traversal detects branches and loops without hanging',()=>{const edges=[{from:'a',to:'b'},{from:'a',to:'c'},{from:'c',to:'d'}];assert.equal(reaches(edges,'a','d'),true);assert.equal(reaches(edges,'d','a'),false);assert.equal(reaches([...edges,{from:'d',to:'a'}],'d','b'),true)});
 test('archived HTML is standalone and escapes task input',()=>{const html=recordHTML(data,new Date('2026-10-19T00:00'));assert.match(html,/<svg/);assert.match(html,/&lt;script&gt;/);assert.doesNotMatch(html,/<script>/);assert.match(html,/150 min preparation/);assert.match(html,/A &amp; B/);assert.equal(dateKey(new Date(2026,9,19)),'2026-10-19')});
+
+test('duplicating selected tasks preserves relative placement, attaches tags, and copies internal links only',()=>{
+ let next=0;const id=()=>`copy-${++next}`,local=d=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+ const a={...task,id:'a',title:'Seed',start:'2026-11-12T09:00',groupId:'old-group',checklist:[{text:'Prepare',done:true}]};
+ const b={...task,id:'b',title:'Treat',start:'2026-11-12T14:30',y:200,groupId:'old-group'};
+ const c={...task,id:'c',title:'Analyze',start:'2026-11-13T10:00',y:400};
+ const edges=[{id:'ab',from:'a',to:'b',dashed:false},{id:'bc',from:'b',to:'c',dashed:true}];
+ const tags=[{id:'label',taskId:'a',x:0,y:0,text:'Important',color:'#b83f4b',shape:'flag'}];
+ const original={tasks:[a,b,c],edges,tags,questions:[],notes:''};
+ const out=duplicateTaskSelection(original,['b','a'],id,local);
+ assert.equal(out.newIds.length,2);
+ assert.equal(out.tasks.length,5);
+ const copiedA=out.tasks.find(t=>t.id===out.newIds[0]),copiedB=out.tasks.find(t=>t.id===out.newIds[1]);
+ assert.equal(copiedA.title,'Seed (copy)');
+ assert.equal(copiedB.title,'Treat (copy)');
+ assert.equal(copiedA.start,'2026-11-12T10:00');
+ assert.equal(copiedB.start,'2026-11-12T15:30');
+ assert.equal(copiedA.y,a.y+70);
+ assert.equal(copiedB.y,b.y+70);
+ assert.equal(copiedB.y-copiedA.y,b.y-a.y);
+ assert.equal(copiedA.groupId,copiedB.groupId);
+ assert.notEqual(copiedA.groupId,'old-group');
+ assert.notEqual(copiedA.checklist,a.checklist);
+ assert.notEqual(copiedA.checklist[0],a.checklist[0]);
+ assert.equal(out.edges.length,3);
+ assert.deepEqual(out.edges.at(-1),{id:out.edges.at(-1).id,from:copiedA.id,to:copiedB.id,dashed:false});
+ assert.equal(out.tags.length,2);
+ assert.equal(out.tags.at(-1).taskId,copiedA.id);
+ assert.equal(out.tags.at(-1).text,'Important');
+ assert.equal(validData({...original,tasks:out.tasks,edges:out.edges,tags:out.tags}),true);
+ assert.deepEqual(original.tasks,[a,b,c],'undo data remains untouched');
+ assert.equal(original.edges.length,2);
+});
+test('right-click on an unselected task duplicates only that task; single group member is detached',()=>{
+ let next=0;const newId=()=>`id-${++next}`,format=d=>new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+ const other={...task,id:'b',title:'Other'};
+ const grouped={...task,id:'a',groupId:'group'};
+ const out=duplicateTaskSelection({tasks:[grouped,other],edges:[{id:'edge',from:'a',to:'b',dashed:true}]},['a'],newId,format);
+ assert.equal(out.newIds.length,1);
+ assert.equal(out.tasks[2].groupId,undefined);
+ assert.equal(out.edges.length,1);
+ assert.equal(out.tags.length,0);
+ assert.equal(out.tasks[2].title,grouped.title+' (copy)');
+ assert.equal(validData({...data,tasks:out.tasks,edges:out.edges,tags:out.tags}),true);
+});
