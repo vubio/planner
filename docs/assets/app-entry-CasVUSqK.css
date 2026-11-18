@@ -19,3 +19,13 @@
 /* Marquee selection replaces the old right-button panning gesture. */
 .marquee-selection{position:absolute;pointer-events:none;z-index:15;border:1.5px solid #2e7058;border-radius:3px;background:rgba(46,112,88,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
 .marquee-selection span{position:absolute;top:-25px;left:0;white-space:nowrap;background:#355b47;color:white;padding:3px 7px;border-radius:5px;font-size:11px;font-weight:700;box-shadow:0 2px 7px #153b2b26}
+
+
+/* One-hour 12h ruler with a single period caption per visible half-day. */
+.ruler .day .pm-ruler-shade{position:absolute;top:0;bottom:0;pointer-events:none;background:rgba(29,45,36,.035);z-index:0}
+.ruler .day .halfday-labels{position:absolute;top:34px;left:0;right:0;height:14px;pointer-events:none;z-index:2}
+.ruler .day .halfday-label{position:absolute;display:block;text-align:center;white-space:nowrap;letter-spacing:.13em;font-size:10px;line-height:14px;font-weight:800;color:#627766;overflow:hidden}
+.ruler .day .ticks{z-index:2}
+.ruler .day .ticks span{white-space:nowrap;line-height:1.2}
+.day-grid .pm-canvas-shade{position:absolute;top:0;bottom:0;pointer-events:none;background:rgba(29,45,36,.03);z-index:0}
+.day-grid .noon-grid-line{border-left:1px dashed rgba(70,109,83,.6);z-index:1}
