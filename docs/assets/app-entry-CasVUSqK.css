@@ -15,3 +15,7 @@
 .duration-inputs span{font-size:10px;color:#667d69;flex-shrink:0}
 .duration-end{display:block;color:#627b64;line-height:1.35;font-size:10px}
 .duration-error{display:block;color:#aa4a4a;font-size:10px}
+
+/* Marquee selection replaces the old right-button panning gesture. */
+.marquee-selection{position:absolute;pointer-events:none;z-index:15;border:1.5px solid #2e7058;border-radius:3px;background:rgba(46,112,88,.12);box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+.marquee-selection span{position:absolute;top:-25px;left:0;white-space:nowrap;background:#355b47;color:white;padding:3px 7px;border-radius:5px;font-size:11px;font-weight:700;box-shadow:0 2px 7px #153b2b26}
