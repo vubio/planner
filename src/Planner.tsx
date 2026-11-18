@@ -250,7 +250,7 @@ export default function Planner(){
  const marqueePointerDown=(e:React.PointerEvent<HTMLDivElement>)=>{
   if(e.button!==2||!scroll.current||!canvas.current)return;
   const viewportRect=scroll.current.getBoundingClientRect(),canvasRect=canvas.current.getBoundingClientRect();
-  if(e.clientX<viewportRect.left||e.clientX>viewportRect.right||e.clientY<Math.max(viewportRect.top,canvasRect.top+80)||e.clientY>viewportRect.bottom)return;
+  if(e.clientX<viewportRect.left||e.clientX>viewportRect.right||e.clientY<Math.max(viewportRect.top+80,canvasRect.top+80)||e.clientY>viewportRect.bottom)return;
   e.preventDefault();e.stopPropagation();
   const pointerId=e.pointerId,startClientX=e.clientX,startClientY=e.clientY;
   const startX=e.clientX-canvasRect.left,startY=e.clientY-canvasRect.top;
