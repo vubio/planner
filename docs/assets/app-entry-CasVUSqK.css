@@ -29,3 +29,33 @@
 .ruler .day .ticks span{white-space:nowrap;line-height:1.2}
 .day-grid .pm-canvas-shade{position:absolute;top:0;bottom:0;pointer-events:none;background:rgba(29,45,36,.03);z-index:0}
 .day-grid .noon-grid-line{border-left:1px dashed rgba(70,109,83,.6);z-index:1}
+
+
+/* Resizable compact note panel: one toolbar row and an independent note-list scroll. */
+.app:not(.focus-mode) .bottom-panel{position:relative;flex:0 0 auto;height:clamp(118px,16dvh,145px);min-height:76px;max-height:none;overflow:hidden}
+.app:not(.focus-mode) .bottom-resize-handle{position:relative;display:block;flex:0 0 7px;height:7px;cursor:ns-resize;touch-action:none;user-select:none;background:#f5f8f2;border-bottom:1px solid #e1e9de;z-index:4}
+.bottom-resize-handle::after{content:"";position:absolute;left:50%;top:2px;transform:translateX(-50%);width:56px;height:3px;border-radius:5px;background:#b9cbbc;transition:background .15s,width .15s}
+.bottom-resize-handle:hover::after,.bottom-resize-handle:focus-visible::after{background:#446f55;width:78px}
+.bottom-resize-handle:focus-visible{outline:2px solid #658c70;outline-offset:-2px}
+.app:not(.focus-mode) .bottom-panel .panel-tabs{display:flex;flex:0 0 auto;align-items:center;flex-wrap:nowrap;white-space:nowrap;gap:4px;min-width:0;min-height:35px;padding:3px 8px 4px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#cad8c7 transparent}
+.app:not(.focus-mode) .bottom-panel .panel-tabs>button{flex:0 0 auto;min-width:max-content;padding:4px 7px;font-size:10px}
+.app:not(.focus-mode) .note-toolbar-actions{display:flex;align-items:center;flex:1 0 auto;min-width:0;gap:7px;margin-left:5px}
+.app:not(.focus-mode) .note-toolbar-actions form{display:flex;flex:0 1 300px;min-width:215px;align-items:center;gap:4px;margin:0;padding:0}
+.app:not(.focus-mode) .note-toolbar-actions form>svg{flex:none;color:#8aa08b}
+.app:not(.focus-mode) .note-toolbar-actions form>input{flex:1 1 auto;min-width:115px;width:100%;height:26px;padding:3px 6px;font-size:11px;border:1px solid #d9e4d6;background:#fff;border-radius:5px}
+.app:not(.focus-mode) .note-toolbar-actions form>button{height:26px;min-height:26px;padding:3px 7px;font-size:10px;white-space:nowrap;flex:none}
+.app:not(.focus-mode) .note-toolbar-actions .note-inbox-controls{display:flex;align-items:center;flex:0 0 auto;flex-wrap:nowrap;gap:5px;margin:0;padding:0;border:0;min-height:0}
+.app:not(.focus-mode) .note-toolbar-actions .note-inbox-controls label{display:flex;align-items:center;gap:4px;white-space:nowrap;font-size:10px;flex:none}
+.app:not(.focus-mode) .note-toolbar-actions .note-pending-switch{padding:2px 5px;min-height:26px}
+.app:not(.focus-mode) .note-toolbar-actions .note-pending-switch input{margin:0;width:12px;height:12px}
+.app:not(.focus-mode) .note-toolbar-actions .note-inbox-sort select{max-width:125px;height:26px;padding:3px 5px;font-size:10px}
+.app:not(.focus-mode) .note-toolbar-actions .note-inbox-search{padding:0 5px;height:26px}
+.app:not(.focus-mode) .note-toolbar-actions .note-inbox-search input{width:105px;padding:2px 0;font-size:10px}
+.app:not(.focus-mode) .note-toolbar-actions .note-inbox-count{margin:0 2px;white-space:nowrap;font-size:9px}
+.app:not(.focus-mode) .questions.note-inbox{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:3px 9px 7px}
+.app:not(.focus-mode) .note-inbox-list{margin-top:0;gap:5px}
+.app:not(.focus-mode) .scratchpad{flex:1 1 auto;min-height:0;overflow-y:auto;padding:9px 12px}
+@media(max-width:700px){
+ .app:not(.focus-mode) .bottom-panel{min-height:74px;max-height:none}
+ .app:not(.focus-mode) .note-toolbar-actions form{min-width:185px}
+}
