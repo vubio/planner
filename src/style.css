@@ -647,3 +647,52 @@ body:has(.app.focus-mode) .drive-sync-launcher::before{content:none}
  .app:not(.focus-mode) .bottom-panel{min-height:74px;max-height:none}
  .app:not(.focus-mode) .note-toolbar-actions form{min-width:185px}
 }
+
+
+/* Clear 12:00 AM day transitions and a highly visible live time marker. */
+.ruler .day{
+  border-left:3px solid #48775b;
+  box-shadow:inset 7px 0 9px -8px rgba(46,87,60,.27);
+}
+.canvas .day-grid{
+  border-left:3px solid #48775b;
+  box-shadow:inset 7px 0 10px -7px rgba(46,87,60,.23);
+}
+.canvas .day-grid::before{
+  content:"";
+  position:absolute;
+  top:0;bottom:0;left:0;width:9px;
+  background:linear-gradient(to right,rgba(43,95,66,.085),transparent);
+  pointer-events:none;
+}
+/* Live NOW: warm dashed line, subtle halo, visible dot and legible pill below the ruler. */
+.canvas .now-line{
+  border-left:3px dashed #c34e2b;
+  z-index:12;
+  pointer-events:none;
+  filter:drop-shadow(0 0 3px rgba(195,78,43,.35));
+  box-shadow:-3px 0 0 rgba(255,255,255,.65),3px 0 0 rgba(195,78,43,.08);
+}
+.canvas .now-line::before{
+  content:"";
+  position:absolute;
+  top:0;left:-7px;
+  width:11px;height:11px;
+  background:#c34e2b;
+  border:2px solid #fff;
+  border-radius:50%;
+  box-shadow:0 0 0 1px rgba(195,78,43,.28),0 1px 5px rgba(136,52,32,.32);
+}
+.canvas .now-line span{
+  top:10px;left:12px;
+  padding:4px 7px;
+  border-radius:5px;
+  border:1px solid #fff9;
+  background:#b84628;
+  color:white;
+  font-size:11px;
+  line-height:1.2;
+  font-weight:800;
+  white-space:nowrap;
+  box-shadow:0 2px 7px rgba(108,48,26,.3);
+}
