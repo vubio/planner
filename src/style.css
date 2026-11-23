@@ -696,3 +696,16 @@ body:has(.app.focus-mode) .drive-sync-launcher::before{content:none}
   white-space:nowrap;
   box-shadow:0 2px 7px rgba(108,48,26,.3);
 }
+
+
+/* Core working hours (07:00–17:00): a faint sage wash, distinct from the existing AM/PM split.
+   This sits behind grid lines, tasks, reservations, arrows and the live NOW indicator. */
+.day-grid .core-hours-canvas-shade{
+  position:absolute;top:0;bottom:0;z-index:0;pointer-events:none;
+  background:rgba(106,155,112,.075);
+  box-shadow:inset 1px 0 rgba(88,136,99,.09),inset -1px 0 rgba(88,136,99,.09);
+}
+.ruler .day .core-hours-ruler-shade{
+  position:absolute;top:0;bottom:0;z-index:0;pointer-events:none;
+  background:rgba(106,155,112,.065);
+}
