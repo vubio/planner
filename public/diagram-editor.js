@@ -8,6 +8,18 @@ const esc=value=>String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g
 const num=(value, fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 function friendly(date){const d=new Date(date);return isNaN(+d)?'':d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});}
+function titleLines(text){
+ const words=String(text||'Untitled task').replace(/\s+/g,' ').trim().split(' '),lines=[];
+ for(const word of words){const last=lines.length-1;if(last<0||((lines[last]+' '+word).length>25&&lines[last]))lines.push(word);else lines[last]+=' '+word;}
+ return lines.join('\n');
+}
+function endLabel(start,end){
+ const a=new Date(start),b=new Date(end);
+ const dayA=Date.UTC(a.getFullYear(),a.getMonth(),a.getDate());
+ const dayB=Date.UTC(b.getFullYear(),b.getMonth(),b.getDate());
+ const days= Math.round((dayB-dayA)/86400000);
+ return friendly(b)+(days>0?' (+'+days+'d)':days<0?' ('+days+'d)':'');
+}
 function buildModel(input){
  const taskList=Array.isArray(input&&input.tasks)?input.tasks:[];
  const seen=new Set(),tasks=taskList.filter(t=>t&&t.id&&!seen.has(t.id)&&seen.add(t.id));
@@ -35,23 +47,25 @@ function buildModel(input){
   const columns=new Map();
   group.forEach(t=>{const depth=clamp(layer.get(t.id),0,12);if(!columns.has(depth))columns.set(depth,[]);columns.get(depth).push(t);});
   const maxPerColumn=Math.max(1,...Array.from(columns.values()).map(arr=>arr.length));
+  const titleLineCount=Math.max(1,...group.map(t=>titleLines(t.title).split('\n').length));
+  const nodeH=95+18*(titleLineCount-1),rowStep=nodeH+25,timeOffset=52+18*(titleLineCount-1),durationOffset=78+18*(titleLineCount-1);
   if(components.length>1)objects.push({id:uid(),type:'text',x:62,y:groupTop-22,text:'Workflow '+(g+1),fontSize:14,font:'Arial',bold:true,italic:false,align:'start',color:'#555555'});
   for(const [depth,column] of columns){
    column.forEach((task,row)=>{
-    const x=64+depth*255,y=groupTop+row*133,id=uid();
+    const x=64+depth*255,y=groupTop+row*rowStep,id=uid();
     nodeMap.set(task.id,id);
-    objects.push({id,type:'rect',x,y,w:204,h:91,fill:'#ffffff',stroke:'#303030',strokeWidth:1.5,dash:false,taskId:task.id});
-    objects.push({id:uid(),type:'text',parent:id,x:x+12,y:y+24,text:String(task.title||'Untitled task'),font:'Arial',fontSize:15,bold:true,italic:false,align:'start',color:'#191919'});
+    objects.push({id,type:'rect',x,y,w:204,h:nodeH,fill:'#ffffff',stroke:'#303030',strokeWidth:1.5,dash:false,taskId:task.id});
+    objects.push({id:uid(),type:'text',parent:id,x:x+12,y:y+23,text:titleLines(task.title),font:'Arial',fontSize:15,bold:true,italic:false,align:'start',color:'#191919'});
     const start=new Date(task.start),end=new Date(start.getTime()+Math.max(0,num(task.duration))*60000);
-    objects.push({id:uid(),type:'text',parent:id,x:x+12,y:y+52,text:friendly(start),font:'Arial',fontSize:11,bold:false,italic:false,align:'start',color:'#454545'});
-    objects.push({id:uid(),type:'text',parent:id,x:x+192,y:y+52,text:friendly(end),font:'Arial',fontSize:11,bold:false,italic:false,align:'end',color:'#454545'});
+    objects.push({id:uid(),type:'text',parent:id,x:x+12,y:y+timeOffset,text:friendly(start),font:'Arial',fontSize:11,bold:false,italic:false,align:'start',color:'#454545'});
+    objects.push({id:uid(),type:'text',parent:id,x:x+192,y:y+timeOffset,text:endLabel(start,end),font:'Arial',fontSize:11,bold:false,italic:false,align:'end',color:'#454545'});
     const minutes=Math.max(0,Math.round(num(task.duration))),hours=Math.floor(minutes/60),remainder=minutes%60;
     const duration=(hours?hours+' h ':'')+(remainder?remainder+' min':'');
-    objects.push({id:uid(),type:'text',parent:id,x:x+102,y:y+78,text:duration||'0 min',font:'Arial',fontSize:10,bold:false,italic:false,align:'middle',color:'#777777'});
+    objects.push({id:uid(),type:'text',parent:id,x:x+102,y:y+durationOffset,text:duration||'0 min',font:'Arial',fontSize:10,bold:false,italic:false,align:'middle',color:'#777777'});
     maxX=Math.max(maxX,x+240);
    });
   }
-  groupTop+=Math.max(1,maxPerColumn)*133+83;
+  groupTop+=Math.max(1,maxPerColumn)*rowStep+83;
  }
  edges.forEach(e=>{if(nodeMap.has(e.from)&&nodeMap.has(e.to))objects.unshift({id:uid(),type:'connector',from:nodeMap.get(e.from),to:nodeMap.get(e.to),stroke:'#222222',strokeWidth:1.6,dash:!!e.dashed,arrow:true});});
  return {items:objects,width:Math.max(940,maxX+55),height:Math.max(560,groupTop+20),count:tasks.length,edgeCount:edges.length};
