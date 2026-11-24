@@ -22,12 +22,12 @@
 
 
 /* One-hour 12h ruler with a single period caption per visible half-day. */
-.ruler .day .pm-ruler-shade{position:absolute;top:0;bottom:0;pointer-events:none;background:rgba(29,45,36,.035);z-index:0}
+
 .ruler .day .halfday-labels{position:absolute;top:34px;left:0;right:0;height:14px;pointer-events:none;z-index:2}
 .ruler .day .halfday-label{position:absolute;display:block;text-align:center;white-space:nowrap;letter-spacing:.13em;font-size:10px;line-height:14px;font-weight:800;color:#627766;overflow:hidden}
 .ruler .day .ticks{z-index:2}
 .ruler .day .ticks span{white-space:nowrap;line-height:1.2}
-.day-grid .pm-canvas-shade{position:absolute;top:0;bottom:0;pointer-events:none;background:rgba(29,45,36,.03);z-index:0}
+
 .day-grid .noon-grid-line{border-left:1px dashed rgba(70,109,83,.6);z-index:1}
 
 
@@ -110,8 +110,8 @@
 }
 
 
-/* Core working hours (07:00–17:00): a faint sage wash, distinct from the existing AM/PM split.
-   This sits behind grid lines, tasks, reservations, arrows and the live NOW indicator. */
+/* Two-tone timeline: a faint sage wash from 07:00–17:00; neutral background otherwise.
+   The AM/PM labels and noon divider remain, without additional afternoon shading. */
 .day-grid .core-hours-canvas-shade{
   position:absolute;top:0;bottom:0;z-index:0;pointer-events:none;
   background:rgba(106,155,112,.075);
