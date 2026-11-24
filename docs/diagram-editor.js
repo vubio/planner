@@ -75,7 +75,7 @@ function buildModel(input){
   group.forEach(t=>{const depth=clamp(layer.get(t.id),0,12);if(!columns.has(depth))columns.set(depth,[]);columns.get(depth).push(t);});
   const maxPerColumn=Math.max(1,...Array.from(columns.values()).map(arr=>arr.length));
   const titleLineCount=Math.max(1,...group.map(t=>titleLines(t.title).split('\n').length));
-  const nodeH=55+18*(titleLineCount-1),rowStep=nodeH+14,timeOffset=41+18*(titleLineCount-1),durationOffset=timeOffset;
+  const nodeH=70+18*(titleLineCount-1),rowStep=nodeH+14,timeOffset=38+18*(titleLineCount-1),durationOffset=58+18*(titleLineCount-1);
   if(components.length>1)objects.push({id:uid(),type:'text',x:62,y:groupTop-22,text:'Workflow '+(g+1),fontSize:14,font:'Arial',bold:true,italic:false,align:'start',color:'#555555'});
   for(const [depth,column] of columns){
    column.forEach((task,row)=>{
@@ -84,11 +84,11 @@ function buildModel(input){
     objects.push({id,type:'rect',x,y,w:204,h:nodeH,fill:'#ffffff',stroke:'#303030',strokeWidth:1.5,dash:false,taskId:task.id});
     objects.push({id:uid(),type:'text',parent:id,x:x+12,y:y+19,text:titleLines(task.title),font:'Arial',fontSize:14,bold:true,italic:false,align:'start',color:'#191919'});
     const start=new Date(task.start),end=new Date(start.getTime()+Math.max(0,num(task.duration))*60000);
-    objects.push({id:uid(),type:'text',parent:id,x:x+12,y:y+timeOffset,text:friendly(start),font:'Arial',fontSize:11,bold:false,italic:false,align:'start',color:'#454545'});
-    objects.push({id:uid(),type:'text',parent:id,x:x+192,y:y+timeOffset,text:endLabel(start,end),font:'Arial',fontSize:11,bold:false,italic:false,align:'end',color:'#454545'});
+    objects.push({id:uid(),type:'text',parent:id,x:x+12,y:y+timeOffset,text:friendly(start),font:'Arial',fontSize:10,bold:false,italic:false,align:'start',color:'#6b7280'});
+    objects.push({id:uid(),type:'text',parent:id,x:x+192,y:y+timeOffset,text:endLabel(start,end),font:'Arial',fontSize:10,bold:false,italic:false,align:'end',color:'#6b7280'});
     const minutes=Math.max(0,Math.round(num(task.duration))),hours=Math.floor(minutes/60),remainder=minutes%60;
     const duration=(hours?hours+' h ':'')+(remainder?remainder+' min':'');
-    objects.push({id:uid(),type:'text',parent:id,x:x+102,y:y+durationOffset,text:duration||'0 min',font:'Arial',fontSize:9,bold:false,italic:false,align:'middle',color:'#777777'});
+    objects.push({id:uid(),type:'text',parent:id,x:x+102,y:y+durationOffset,text:duration||'0 min',font:'Arial',fontSize:12,bold:true,italic:false,align:'middle',color:'#1f2937'});
     maxX=Math.max(maxX,x+204);
    });
   }
@@ -142,6 +142,11 @@ const rectOf=o=>{
  return {x:0,y:0,w:0,h:0};
 };
 const marker='<defs><marker id="dg-head" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0 0 L8 4 L0 8 z" fill="#222222"/></marker></defs>';
+/** Smooth, bounded zoom for either mouse wheels or trackpads. */
+function diagramWheelScale(current,deltaY){
+ const limited=clamp(num(deltaY),-120,120);
+ return clamp(current*Math.exp(-limited*.0018),.3,2.5);
+}
 function open(input){
  if(document.querySelector('.dg-overlay'))return;
  const original=buildModel(input);
@@ -176,7 +181,7 @@ function open(input){
  const item=id=>items.find(o=>o.id===id);
  const say=text=>{status.textContent=text;};
  function checkpoint(){history.push(clone(items));if(history.length>50)history.shift();future=[];dirty=true;}
- function close(){if(dirty&&!confirm('Close the diagram editor? Changes in this popup are not saved. Export first if needed.'))return;document.body.style.overflow=oldOverflow;window.removeEventListener('keydown',keyHandler,true);root.remove();}
+ function close(){if(dirty&&!confirm('Close the diagram editor? Changes in this popup are not saved. Export first if needed.'))return;document.body.style.overflow=oldOverflow;window.removeEventListener('keydown',keyHandler,true);viewport.removeEventListener('wheel',handleEditorWheel);root.remove();}
  function setTool(name){tool=name;connectorFrom=null;draw=null;root.querySelectorAll('[data-tool]').forEach(b=>b.classList.toggle('active',b.dataset.tool===name));say(name==='connector'?'Click a first box, then the box to connect.':name==='select'?'Drag objects, resize shapes or select several items with Shift-click.':'Click or drag on the canvas to add '+name+'.');}
  function bounds(){return {width,height};}
  function position(ev){const r=svg.getBoundingClientRect();return {x:(ev.clientX-r.left)*width/Math.max(1,r.width),y:(ev.clientY-r.top)*height/Math.max(1,r.height)};}
@@ -388,6 +393,23 @@ function open(input){
  }
  function reorder(front){if(!selected.length)return;checkpoint();const chosen=items.filter(o=>selected.includes(o.id)),rest=items.filter(o=>!selected.includes(o.id));items=front?rest.concat(chosen):chosen.concat(rest);render();}
  function setZoom(value){zoom=clamp(value,.3,2.5);render();}
+ /** Ctrl + scroll zooms only this diagram, preserving the content beneath the cursor.
+  * The non-passive wheel listener prevents browser/page zoom. */
+ function handleEditorWheel(ev){
+  if(!ev.ctrlKey)return;
+  ev.preventDefault();ev.stopPropagation();
+  const oldZoom=zoom;
+  const nextZoom=diagramWheelScale(oldZoom,ev.deltaY);
+  if(Math.abs(nextZoom-oldZoom)<.000001)return;
+  const before=stage.getBoundingClientRect();
+  const anchorX=clamp((ev.clientX-before.left)/oldZoom,0,width);
+  const anchorY=clamp((ev.clientY-before.top)/oldZoom,0,height);
+  zoom=nextZoom;
+  render();
+  const after=stage.getBoundingClientRect();
+  viewport.scrollLeft+=after.left+anchorX*zoom-ev.clientX;
+  viewport.scrollTop+=after.top+anchorY*zoom-ev.clientY;
+ }
  function fit(){const w=viewport.clientWidth-44,h=viewport.clientHeight-44;setZoom(Math.min(1.25,w/width,h/height));}
  function downloadFile(content,type,name){const url=URL.createObjectURL(new Blob([content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1500);}
  const filename=()=> 'experiment-diagram-'+new Date().toISOString().slice(0,10);
@@ -457,8 +479,9 @@ function open(input){
  svg.addEventListener('pointercancel',endDrag);
  svg.addEventListener('dblclick',ev=>{const o=findTarget(ev);if(o&&o.type==='text'){ev.preventDefault();select([o.id]);inlineEdit(o);}});
  window.addEventListener('keydown',keyHandler,true);
+ viewport.addEventListener('wheel',handleEditorWheel,{passive:false});
  setTool('select');renderInspector();
  requestAnimationFrame(()=>{fit();say('Ready. Move boxes and individual labels freely; only exported files leave this editor.');});
 }
-window.VubioDiagramEditor={open,route:tidyConnectorRoute,colors:DIAGRAM_COLORS.map(([hex,name])=>({hex,name})),preview:input=>{const model=buildModel(input);return {nodes:model.items.filter(o=>o.type==='rect').length,connectors:model.items.filter(o=>o.type==='connector').length,groups:model.items.filter(o=>o.type==='text'&&/^Workflow \d+$/.test(o.text)).length,width:model.width,height:model.height,boxHeights:model.items.filter(o=>o.type==='rect').map(o=>o.h)};}};
+window.VubioDiagramEditor={open,wheelScale:diagramWheelScale,route:tidyConnectorRoute,colors:DIAGRAM_COLORS.map(([hex,name])=>({hex,name})),preview:input=>{const model=buildModel(input);return {nodes:model.items.filter(o=>o.type==='rect').length,connectors:model.items.filter(o=>o.type==='connector').length,groups:model.items.filter(o=>o.type==='text'&&/^Workflow \d+$/.test(o.text)).length,width:model.width,height:model.height,boxHeights:model.items.filter(o=>o.type==='rect').map(o=>o.h)};}};
 })();

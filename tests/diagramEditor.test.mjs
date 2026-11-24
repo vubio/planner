@@ -53,7 +53,7 @@ test('diagram boxes and workflow layout use the compact two-row design',()=>{
  assert.equal(diagram.connectors,4);
  assert.equal(diagram.width,960);
  assert.equal(diagram.height,540);
- assert.ok(diagram.boxHeights.every(height=>height===55),'compact single-line tasks remain short');
+ assert.ok(diagram.boxHeights.every(height=>height===70),'duration has a distinct readable row without oversized boxes');
 });
 test('very long titles retain vertical breathing room',()=>{
  const brief=preview({tasks:[task('a','09:00')],edges:[]});
@@ -96,4 +96,23 @@ test('empty diagram preview remains a valid landscape page',()=>{
  assert.equal(out.nodes,0);
  assert.equal(out.width,960);
  assert.equal(out.height,540);
+});
+
+test('Ctrl + scroll zoom is bounded and acts only inside the diagram viewport',()=>{
+ const scale=sandbox.window.VubioDiagramEditor.wheelScale;
+ assert.ok(scale(1,-100)>1,'scroll up zooms in');
+ assert.ok(scale(1,100)<1,'scroll down zooms out');
+ assert.equal(scale(0.3,120),0.3,'zoom cannot go below minimum');
+ assert.equal(scale(2.5,-120),2.5,'zoom cannot exceed maximum');
+ assert.ok(script.includes("viewport.addEventListener('wheel',handleEditorWheel,{passive:false})"),'the viewport listens without passive wheel handling');
+ assert.ok(script.includes('ev.preventDefault();ev.stopPropagation();'),'browser zoom is blocked for Ctrl + wheel');
+ assert.ok(script.includes('viewport.removeEventListener('),'wheel listener is removed on closing');
+ assert.ok(script.includes('anchorX*zoom-ev.clientX'),'zoom stays centered on the pointer');
+});
+test('duration is emphasized over start/end time without changing planner data',()=>{
+ const model=preview({tasks:[{...task('treatment','09:00'),duration:720}],edges:[]});
+ assert.equal(model.boxHeights[0],70,'compact independent duration row');
+ assert.ok(script.includes("fontSize:12,bold:true,italic:false,align:'middle',color:'#1f2937'"),'duration is prominent');
+ assert.ok(script.includes("fontSize:10,bold:false,italic:false,align:'start',color:'#6b7280'"),'start time is secondary');
+ assert.ok(script.includes("fontSize:10,bold:false,italic:false,align:'end',color:'#6b7280'"),'end time is secondary');
 });
