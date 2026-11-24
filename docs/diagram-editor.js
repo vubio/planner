@@ -330,7 +330,7 @@ function open(input){
    if(name==='copysvg'){await navigator.clipboard.writeText(toSvg());say('SVG source copied. Paste into an SVG-capable editor.');}
    if(name==='png'){const blob=await imageBlob();downloadFile(blob,'image/png',filename()+'.png');say('High-resolution PNG downloaded.');}
    if(name==='copypng'){if(!navigator.clipboard||!navigator.clipboard.write||typeof ClipboardItem==='undefined')throw new Error('Image clipboard unavailable in this browser. Use Download PNG.');
-    const blob=await imageBlob();await navigator.clipboard.write([new ClipboardItem({'image/png':blob})]);say('Diagram image copied. Paste into your lab notebook.');
+    const blobPromise=imageBlob();await navigator.clipboard.write([new ClipboardItem({'image/png':blobPromise})]);say('Diagram image copied. Paste into your lab notebook.');
    }
   }catch(e){say('Export error: '+(e&&e.message||e));}
  }
