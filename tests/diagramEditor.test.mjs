@@ -13,8 +13,8 @@ test('make-diagram accepts separate workflow groups without inventing cross-link
  ]};
  const original=JSON.stringify(input),out=preview(input);
  assert.equal(out.nodes,5);assert.equal(out.connectors,3);assert.equal(out.groups,2);
- assert.ok(out.height>290 && out.height<500, 'compact layout uses less vertical space');
- assert.ok(out.width>=520 && out.width<940, 'diagram fits its objects horizontally');
+ assert.equal(out.width/out.height,16/9,'diagram exports in landscape 16:9');
+ assert.ok(out.width>=960&&out.height>=540,'page is at least PowerPoint slide-sized');
  assert.equal(JSON.stringify(input),original,'diagram conversion cannot mutate planner data');
 });
 test('unconnected selections stay separate, with no arrows',()=>{
@@ -51,14 +51,15 @@ test('diagram boxes and workflow layout use the compact two-row design',()=>{
  ]});
  assert.equal(diagram.nodes,5);
  assert.equal(diagram.connectors,4);
- assert.ok(diagram.height<420,'four branch rows should fit in a compact export');
- assert.ok(diagram.width<700,'diagram no longer includes a large empty right margin');
+ assert.equal(diagram.width,960);
+ assert.equal(diagram.height,540);
+ assert.ok(diagram.boxHeights.every(height=>height===55),'compact single-line tasks remain short');
 });
 test('very long titles retain vertical breathing room',()=>{
  const brief=preview({tasks:[task('a','09:00')],edges:[]});
  const longTask={...task('a','09:00'),title:'Retinol preloading HSC-T6 cells across several culture vessels with overnight incubation'};
  const longer=preview({tasks:[longTask],edges:[]});
- assert.ok(longer.height>=brief.height);
+ assert.ok(longer.boxHeights[0]>brief.boxHeights[0], 'long titles increase box height only when required');
 });
 test('connectors remain valid after boxes are rearranged',()=>{
  const route=sandbox.window.VubioDiagramEditor.route;
@@ -66,4 +67,33 @@ test('connectors remain valid after boxes are rearranged',()=>{
  const path=route(source,target);
  assert.match(path,/^M/);
  assert.equal(path.includes('NaN'),false);
+});
+
+test('portrait-like selections still export to 16:9 landscape pages',()=>{
+ const tasks=Array.from({length:13},(_,i)=>({...task(String(i),'09:00',i*12),title:'Experimental step '+i}));
+ const input={tasks,edges:tasks.slice(1).map(t=>({from:'0',to:t.id}))};
+ const original=JSON.stringify(input);
+ const out=preview(input);
+ assert.equal(out.nodes,13);
+ assert.equal(out.connectors,12);
+ assert.equal(out.width/out.height,16/9);
+ assert.ok(out.height>540,'tall workflows expand the page to avoid clipping');
+ assert.equal(JSON.stringify(input),original);
+});
+test('one-click swatches provide common and pastel colors alongside the custom picker',()=>{
+ const palette=sandbox.window.VubioDiagramEditor.colors;
+ assert.equal(palette.length,22);
+ assert.ok(palette.some(p=>p.hex==='#000000'));
+ assert.ok(palette.some(p=>p.hex==='#ffffff'));
+ assert.ok(palette.some(p=>p.hex==='#3879c8'));
+ assert.ok(palette.some(p=>p.hex==='#daf0df'));
+ assert.ok(script.includes('data-color-prop'));
+ assert.ok(script.includes('data-color-value'));
+ assert.ok(script.includes('Custom</span><input type="color"'));
+});
+test('empty diagram preview remains a valid landscape page',()=>{
+ const out=preview({tasks:[],edges:[]});
+ assert.equal(out.nodes,0);
+ assert.equal(out.width,960);
+ assert.equal(out.height,540);
 });

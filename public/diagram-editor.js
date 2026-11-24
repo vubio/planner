@@ -20,6 +20,33 @@ function endLabel(start,end){
  const days= Math.round((dayB-dayA)/86400000);
  return friendly(b)+(days>0?' (+'+days+'d)':days<0?' ('+days+'d)':'');
 }
+
+/** Common PowerPoint-style colors; the native picker remains available for custom shades. */
+const DIAGRAM_COLORS=[
+ ['#ffffff','White'],['#eeeeee','Off-white'],['#c5cbd0','Light gray'],['#7b858d','Slate gray'],['#40474e','Charcoal'],['#000000','Black'],
+ ['#d84b47','Red'],['#e08b36','Orange'],['#edc74c','Yellow'],['#39985b','Green'],['#2b93a9','Teal'],['#3879c8','Blue'],['#7957b5','Purple'],['#bf588e','Pink'],
+ ['#f9deda','Pale red'],['#ffe6cb','Pale orange'],['#fff2bf','Pale yellow'],['#daf0df','Pale green'],['#d9eff3','Pale teal'],['#dde8fa','Pale blue'],['#e9def8','Pale purple'],['#f6dfeb','Pale pink']
+];
+/** A centered 16:9 canvas, with extra space for larger workflows instead of cropping. */
+function landscapePage(items){
+ const rects=items.filter(o=>o.type==='rect'||o.type==='ellipse');
+ const labels=items.filter(o=>o.type==='text');
+ if(!rects.length)return {width:960,height:540};
+ const minX=Math.min(...rects.map(o=>o.x),...labels.map(o=>o.x-6));
+ const maxX=Math.max(...rects.map(o=>o.x+o.w),...labels.map(o=>o.x+12));
+ const minY=Math.min(...rects.map(o=>o.y),...labels.map(o=>o.y-num(o.fontSize,14)));
+ const maxY=Math.max(...rects.map(o=>o.y+o.h),...labels.map(o=>o.y+8));
+ const contentWidth=Math.max(1,maxX-minX),contentHeight=Math.max(1,maxY-minY);
+ const height=Math.ceil(Math.max(540,contentHeight+108,(contentWidth+130)*9/16)/9)*9;
+ const width=height*16/9;
+ const dx=Math.round((width-contentWidth)/2-minX),dy=Math.round((height-contentHeight)/2-minY);
+ for(const o of items){
+  if(o.type==='line'){o.x1+=dx;o.x2+=dx;o.y1+=dy;o.y2+=dy;}
+  else if('x' in o){o.x+=dx;o.y+=dy;}
+ }
+ return {width,height};
+}
+
 function buildModel(input){
  const taskList=Array.isArray(input&&input.tasks)?input.tasks:[];
  const seen=new Set(),tasks=taskList.filter(t=>t&&t.id&&!seen.has(t.id)&&seen.add(t.id));
@@ -68,8 +95,8 @@ function buildModel(input){
   groupTop+=Math.max(1,maxPerColumn)*rowStep+46;
  }
  edges.forEach(e=>{if(nodeMap.has(e.from)&&nodeMap.has(e.to))objects.unshift({id:uid(),type:'connector',from:nodeMap.get(e.from),to:nodeMap.get(e.to),stroke:'#222222',strokeWidth:1.6,dash:!!e.dashed,arrow:true});});
- const bottom=Math.max(0,...objects.filter(o=>o.type==='rect'||o.type==='ellipse').map(o=>o.y+o.h));
- return {items:objects,width:Math.max(520,maxX+44),height:Math.max(210,bottom+42),count:tasks.length,edgeCount:edges.length};
+ const page=landscapePage(objects);
+ return {items:objects,width:page.width,height:page.height,count:tasks.length,edgeCount:edges.length};
 }
 
 /** Schematic connectors with distinct source ports and rounded orthogonal bends. */
@@ -124,7 +151,7 @@ function open(input){
  const root=document.createElement('div');root.className='dg-overlay';
  root.innerHTML='<div class="dg-dialog" role="dialog" aria-modal="true" aria-label="Experiment diagram editor">'+
  '<header class="dg-head"><div><strong>Make a diagram</strong><small>Temporary editor · '+original.count+' tasks · '+original.edgeCount+' connections · Nothing changes in your planner</small></div>'+
- '<div class="dg-head-actions"><button type="button" data-action="reset" title="Rebuild layout from selected tasks">Auto-layout</button><button type="button" data-action="close" class="dg-close" aria-label="Close diagram editor">✕</button></div></header>'+
+ '<div class="dg-head-actions"><span class="dg-slide-size" title="Landscape slide; exports use a 16:9 aspect ratio">▭ Landscape 16:9</span><button type="button" data-action="reset" title="Rebuild layout from selected tasks">Auto-layout</button><button type="button" data-action="close" class="dg-close" aria-label="Close diagram editor">✕</button></div></header>'+
  '<div class="dg-toolbar" role="toolbar" aria-label="Diagram tools">'+
  '<div class="dg-tools">'+
  '<button data-tool="select" title="Select and move (V)">Select</button><button data-tool="text" title="Add text (T)">Text</button>'+
@@ -213,6 +240,16 @@ function open(input){
   root.querySelectorAll('[data-action="grid"]').forEach(b=>b.classList.toggle('active',grid));
  }
  function field(label,prop,value,type='text',options){
+  if(type==='color'){
+   const current=String(value||'#000000').toLowerCase();
+   const buttons=DIAGRAM_COLORS.map(([hex,name])=>
+    '<button type="button" class="dg-swatch'+(hex===current?' selected':'')+'" data-color-prop="'+esc(prop)+
+    '" data-color-value="'+hex+'" aria-label="'+esc(name)+' '+hex+'" aria-pressed="'+(hex===current?'true':'false')+
+    '" title="'+esc(name)+' · '+hex+'" style="--swatch:'+hex+'"></button>').join('');
+   return '<div class="dg-field dg-color-field"><span>'+esc(label)+'</span>'+
+    '<div class="dg-swatches" role="group" aria-label="Quick '+esc(label.toLowerCase())+' colors">'+buttons+'</div>'+
+    '<label class="dg-custom-color"><span>Custom</span><input type="color" data-prop="'+esc(prop)+'" value="'+esc(current)+'" aria-label="Custom '+esc(label.toLowerCase())+'"/></label></div>';
+  }
   const valueHtml=options?'<select data-prop="'+prop+'">'+options.map(v=>'<option value="'+esc(v[0])+'"'+(String(value)===String(v[0])?' selected':'')+'>'+esc(v[1])+'</option>').join('')+'</select>':
    type==='textarea'?'<textarea data-prop="'+prop+'" rows="4">'+esc(value)+'</textarea>':
    type==='checkbox'?'<input type="checkbox" data-prop="'+prop+'"'+(value?' checked':'')+'/>':
@@ -402,6 +439,13 @@ function open(input){
  }
  root.addEventListener('click',ev=>{
   const b=ev.target.closest('button');if(!b)return;
+  if(b.dataset.colorProp){
+   setProp._editing=false;
+   setProp(b.dataset.colorProp,b.dataset.colorValue);
+   setProp._editing=false;
+   renderInspector();
+   return;
+  }
   if(b.dataset.tool)setTool(b.dataset.tool);
   else if(b.dataset.action)action(b.dataset.action);
  });
@@ -416,5 +460,5 @@ function open(input){
  setTool('select');renderInspector();
  requestAnimationFrame(()=>{fit();say('Ready. Move boxes and individual labels freely; only exported files leave this editor.');});
 }
-window.VubioDiagramEditor={open,route:tidyConnectorRoute,preview:input=>{const model=buildModel(input);return {nodes:model.items.filter(o=>o.type==='rect').length,connectors:model.items.filter(o=>o.type==='connector').length,groups:model.items.filter(o=>o.type==='text'&&/^Workflow \d+$/.test(o.text)).length,width:model.width,height:model.height};}};
+window.VubioDiagramEditor={open,route:tidyConnectorRoute,colors:DIAGRAM_COLORS.map(([hex,name])=>({hex,name})),preview:input=>{const model=buildModel(input);return {nodes:model.items.filter(o=>o.type==='rect').length,connectors:model.items.filter(o=>o.type==='connector').length,groups:model.items.filter(o=>o.type==='text'&&/^Workflow \d+$/.test(o.text)).length,width:model.width,height:model.height,boxHeights:model.items.filter(o=>o.type==='rect').map(o=>o.h)};}};
 })();
